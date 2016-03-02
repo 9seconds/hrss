@@ -153,12 +153,13 @@ def parse_options(root, tokens):
         token = tokens.popleft()
 
         if token.option in ("Host", "Host-"):
+            host_tokens = get_host_tokens(current_level, tokens)
             for name in token.values:
                 host = root.add_host(name, is_trackable_host(token.option))
                 host_tokens = get_host_tokens(current_level, tokens)
                 parse_options(host, host_tokens)
-                for _ in range(len(host_tokens)):
-                    tokens.popleft()
+            for _ in range(len(host_tokens)):
+                tokens.popleft()
         elif token.option not in VALID_OPTIONS:
             raise exceptions.ParserUnknownOption(token.option)
         else:
