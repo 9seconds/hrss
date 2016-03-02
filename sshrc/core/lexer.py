@@ -4,7 +4,8 @@
 import collections
 import re
 
-import exceptions
+import sshrc.core
+import sshrc.core.exceptions as exceptions
 
 
 Token = collections.namedtuple(
@@ -19,8 +20,6 @@ RE_QUOTED = re.compile(
     r"(?:{0}|{1}|\S+)".format(RE_QUOTED_SINGLE, RE_QUOTED_DOUBLE))
 RE_OPT_VALUE = re.compile(r"(\w+-?)\s+(.*?)\s*$")
 RE_INDENT = re.compile(r"^\s+")
-
-INDENT_LENGTH = 4
 
 
 def lex(lines):
@@ -57,7 +56,7 @@ def make_token(line, original_line, index):
     values = RE_QUOTED.findall(values)
 
     indentation = len(indentation)
-    if indentation % INDENT_LENGTH:
+    if indentation % sshrc.core.INDENT_LENGTH:
         raise exceptions.LexerIncorrectIndentationLength(
             original_line, index, indentation)
 

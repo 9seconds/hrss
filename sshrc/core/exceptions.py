@@ -1,11 +1,14 @@
 # -*- coding: utf-8 -*-
 
 
-class SSHConfError(Exception):
+import sshrc.core
+
+
+class SSHRCError(Exception):
     pass
 
 
-class ReaderError(SSHConfError):
+class ReaderError(SSHRCError):
     pass
 
 
@@ -25,11 +28,12 @@ class LexerIncorrectOptionValue(LexerError):
 class LexerIncorrectIndentationLength(LexerError):
 
     MESSAGE = ("Incorrect indentation on line {} '{}'"
-               "({} spaces, has to be divisible by 4)")
+               "({} spaces, has to be divisible by {})")
 
     def __init__(self, line, lineno, indentation_value):
         super(LexerIncorrectIndentationLength, self).__init__(
-            self.MESSAGE.format(lineno, line, indentation_value))
+            self.MESSAGE.format(lineno, line,
+                                indentation_value, sshrc.core.INDENT_LENGTH))
 
 
 class LexerIncorrectFirstIndentationError(LexerError):

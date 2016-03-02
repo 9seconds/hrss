@@ -79,6 +79,10 @@ VALID_OPTIONS = frozenset((
 ))
 
 
+VIA_JUMP_HOST_OPTION = "ViaJumpHost"
+VALID_OPTIONS.add(VIA_JUMP_HOST_OPTION)
+
+
 class Host(object):
 
     def __init__(self, name, parent, trackable=True):
@@ -156,10 +160,11 @@ def parse_options(root, tokens):
             host_tokens = get_host_tokens(current_level, tokens)
             for name in token.values:
                 host = root.add_host(name, is_trackable_host(token.option))
-                host_tokens = get_host_tokens(current_level, tokens)
                 parse_options(host, host_tokens)
             for _ in range(len(host_tokens)):
                 tokens.popleft()
+        elif token.option == VIA_JUMP_HOST_OPTION:
+            root["ProxyCommand"] = "ssh -W %h:%p {}".format(token.values[0])
         elif token.option not in VALID_OPTIONS:
             raise exceptions.ParserUnknownOption(token.option)
         else:
