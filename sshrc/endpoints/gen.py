@@ -28,38 +28,69 @@ def main():
 
     LOG.debug("Options are %s", options)
 
+    sequence = (
+        get_content,
+        apply_template,
+        process_syntax,
+        add_header,
+        print_content
+    )
+
+    content = options.source_path
+    try:
+        for func in sequence:
+            content = func(options, content)
+    except Exception:
+        return os.EX_SOFTWARE
+
+    return os.EX_OK
+
+
+def get_content(options, filename):
     try:
         content = sshrc.utils.get_content(options.source_path)
     except Exception as exc:
         LOG.error("Cannot parse source file %s: %s", options.source_path, exc)
-        return os.EX_SOFTWARE
-    else:
-        LOG.debug("Original content is \n%s", content)
+        raise
 
-    if not options.no_templater:
-        try:
-            content = sshrc.EXTRAS["templater"].render(content)
-        except Exception as exc:
-            LOG.error("Cannot process template in source file %s. "
-                      "Templater is %s: %s",
-                      options.source_path, ssshrc.EXTRAS["templater"].name,
-                      exc)
-            return os.EX_SOFTWARE
-        else:
-            LOG.debug("Processed template is \n%s", content)
-    else:
+    LOG.debug("Original content is \n%s", content)
+
+    return content
+
+
+def apply_template(options, content):
+    if options.no_templater:
         LOG.debug("No templating is used.")
+        return content
 
-    if not options.boring_syntax:
-        try:
-            content = sshrc.endpoints.common.parse(content)
-        except Exception as exc:
-            LOG.error("Cannot parse content in source file %s: %s",
-                      options.source_path, exc)
-            return os.EX_SOFTWARE
-    else:
+    try:
+        content = sshrc.EXTRAS["templater"].render(content)
+    except Exception as exc:
+        LOG.error("Cannot process template in source file %s. "
+                  "Templater is %s: %s",
+                  options.source_path, sshrc.EXTRAS["templater"].name,
+                  exc)
+        raise
+
+    LOG.debug("Processed content is \n%s", content)
+
+    return content
+
+
+def process_syntax(options, content):
+    if options.boring_syntax:
         LOG.debug("Boring syntax is used.")
+        return content
 
+    try:
+        return sshrc.endpoints.common.parse(content)
+    except Exception as exc:
+        LOG.error("Cannot parse content in source file %s: %s",
+                  options.source_path, exc)
+        raise
+
+
+def add_header(options, content):
     add_header = options.add_header
     if add_header is None:
         add_header = options.destination_path is not None
@@ -69,17 +100,22 @@ def main():
             sshrc_file=options.source_path)
         content = header + content
 
+    return content
+
+
+def print_content(options, content):
     if options.destination_path is None:
         print(content)
-    else:
-        try:
-            with sshrc.utils.topen(options.destination_path, True) as destfp:
-                destfp.write(content)
-        except Exception as exc:
-            LOG.error("Cannot write to file %s: %s",
-                      options.destination_path, exc)
+        return content
 
-    return os.EX_OK
+    try:
+        with sshrc.utils.topen(options.destination_path, True) as destfp:
+            destfp.write(content)
+    except Exception as exc:
+        LOG.error("Cannot write to file %s: %s", options.destination_path, exc)
+        raise
+    else:
+        return content
 
 
 def get_options():
@@ -117,7 +153,7 @@ def get_options():
             "-t", "--no-templater",
             help="Do not use {} templater for SOURCE_PATH.".format(
                 sshrc.EXTRAS["templater"].name),
-            action="store_false",
+            action="store_true",
             default=False)
 
     return parser.parse_args()

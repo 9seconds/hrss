@@ -5,8 +5,6 @@ import logging
 import logging.handlers
 import sys
 
-import sshrc
-
 
 LOG_NAMESPACE = "sshrc"
 LOG_FORMAT_DEBUG = "[%(levelname)s] %(name)30s:%(lineno)d - %(message)s"

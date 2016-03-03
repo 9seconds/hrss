@@ -3,8 +3,6 @@
 
 import collections
 
-import sshrc.utils
-
 
 Templater = collections.namedtuple("Templater", ["name", "render"])
 
