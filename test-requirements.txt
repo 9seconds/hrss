@@ -1,0 +1,9 @@
+flake8
+flake8-debugger
+hacking
+pep8
+pep8-naming
+pytest
+pytest-cov
+radon
+xenon
