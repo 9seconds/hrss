@@ -1,5 +1,7 @@
 flake8
 flake8-debugger
+flake8-coding
+#flake8-pep257
 hacking
 pep8
 pep8-naming
