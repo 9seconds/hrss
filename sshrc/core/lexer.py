@@ -18,7 +18,7 @@ RE_QUOTED_DOUBLE = r'"(?:[^"\\]|\\.)+"'
 RE_COMMENT = re.compile(r"#.*$")
 RE_QUOTED = re.compile(
     r"(?:{0}|{1}|\S+)".format(RE_QUOTED_SINGLE, RE_QUOTED_DOUBLE))
-RE_OPT_VALUE = re.compile(r"(\w+-?)\s+(.*?)\s*$")
+RE_OPT_VALUE = re.compile(r"(\w+-?)(?:=?|\s+)(.*?)\s*$")
 RE_INDENT = re.compile(r"^\s+")
 
 

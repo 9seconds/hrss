@@ -1,23 +1,35 @@
 # -*- coding: utf-8 -*-
 
 
+import collections
+
+import sshrc.utils
+
+
+Templater = collections.namedtuple("Templater", ["name", "render"])
+
+
 EXTRAS = {
-    "templater": None
+    "templater": Templater(None, lambda content: content)
 }
 
 
 try:
     import mako.template
 except ImportError:
-    EXTRAS["templater"] = None
+    pass
 else:
-    def templater(filename):
-        template = mako.template.Template(filename=filename)
-        rendered = template.render()
+    EXTRAS["templater"] = Templater(
+        "Mako",
+        lambda content: mako.template.Template(content).render_unicode())
 
-        return rendered
 
-    EXTRAS["templater"] = {
-        "name": "Mako",
-        "func": templater
-    }
+if EXTRAS["templater"].name is None:
+    try:
+        import jinja2
+    except ImportError:
+        pass
+    else:
+        EXTRAS["templater"] = Templater(
+            "Jinja2",
+            lambda content: jinja2.Environment().from_string(content).render())

@@ -5,10 +5,10 @@ import collections
 import itertools
 import json
 
-import exceptions
+import sshrc.core.exceptions as exceptions
 
 
-VALID_OPTIONS = frozenset((
+VALID_OPTIONS = set((
     "AddressFamily",
     "BatchMode",
     "BindAddress",
@@ -75,7 +75,8 @@ VALID_OPTIONS = frozenset((
     "UserKnownHostsFile",
     "VerifyHostKeyDNS",
     "VisualHostKey",
-    "XAuthLocation"
+    "XAuthLocation",
+    "User"
 ))
 
 
@@ -94,7 +95,7 @@ class Host(object):
 
     @property
     def fullname(self):
-        parent_name = self.parent.name if self.parent else ""
+        parent_name = self.parent.fullname if self.parent else ""
         return parent_name + self.name
 
     @property
