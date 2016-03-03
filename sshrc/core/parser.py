@@ -6,6 +6,7 @@ import itertools
 import json
 
 import sshrc.core.exceptions as exceptions
+import sshrc.utils
 
 
 VALID_OPTIONS = set((
@@ -79,9 +80,10 @@ VALID_OPTIONS = set((
     "User"
 ))
 
-
 VIA_JUMP_HOST_OPTION = "ViaJumpHost"
 VALID_OPTIONS.add(VIA_JUMP_HOST_OPTION)
+
+LOG = sshrc.utils.logger(__name__)
 
 
 class Host(object):
@@ -118,6 +120,8 @@ class Host(object):
         }
 
     def add_host(self, name, trackable=True):
+        LOG.debug("Add host %s to %s.", name, self)
+
         host = self.__class__(name, self, trackable)
         self.childs.append(host)
 
@@ -140,35 +144,52 @@ class Host(object):
 
 
 def parse(tokens):
+    LOG.info("Start parsing %d tokens.", len(tokens))
+
     root_host = Host("", None)
     root_host = parse_options(root_host, tokens)
     root_host = fix_star_host(root_host)
+
+    LOG.info("Finish parsing of %d tokens.", len(tokens))
+    LOG.debug("Tree is %s", repr(root_host))
 
     return root_host
 
 
 def parse_options(root, tokens):
     if not tokens:
+        LOG.debug("No tokens for root %s.", root)
         return root
 
     current_level = tokens[0].indent
-    tokens = collections.deque(tokens)
+    LOG.debug("Indent level for root %s is %d.", root, current_level)
 
+    tokens = collections.deque(tokens)
     while tokens:
         token = tokens.popleft()
+        LOG.debug("Process token %s for root %s.", token, root)
 
         if token.option in ("Host", "Host-"):
+            LOG.debug("Token %s is host token", token)
+
             host_tokens = get_host_tokens(current_level, tokens)
+            LOG.debug("Found %d host tokens for token %s: %s.",
+                      len(host_tokens), token, host_tokens)
             for name in token.values:
                 host = root.add_host(name, is_trackable_host(token.option))
                 parse_options(host, host_tokens)
             for _ in range(len(host_tokens)):
                 tokens.popleft()
         elif token.option == VIA_JUMP_HOST_OPTION:
+            LOG.debug("Special option %s in token %s is detected.",
+                      VIA_JUMP_HOST_OPTION, token)
             root["ProxyCommand"] = "ssh -W %h:%p {}".format(token.values[0])
         elif token.option not in VALID_OPTIONS:
+            LOG.debug("Option %s in token %s is unknown.", token.option, token)
             raise exceptions.ParserUnknownOption(token.option)
         else:
+            LOG.debug("Add option %s with values %s to host %s.",
+                      token.option, token.values, root)
             root[token.option] = " ".join(token.values)
 
     return root
@@ -179,9 +200,11 @@ def fix_star_host(root):
 
     for host in root.childs:
         if host.name == "*":
+            LOG.debug("Detected known '*' host.")
             star_host = host
             break
     else:
+        LOG.debug("Add new '*' host.")
         star_host = root.add_host("*")
 
     values = {}

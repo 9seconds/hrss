@@ -6,6 +6,7 @@ import re
 
 import sshrc.core
 import sshrc.core.exceptions as exceptions
+import sshrc.utils
 
 
 Token = collections.namedtuple(
@@ -18,19 +19,28 @@ RE_QUOTED_DOUBLE = r'"(?:[^"\\]|\\.)+"'
 RE_COMMENT = re.compile(r"#.*$")
 RE_QUOTED = re.compile(
     r"(?:{0}|{1}|\S+)".format(RE_QUOTED_SINGLE, RE_QUOTED_DOUBLE))
-RE_OPT_VALUE = re.compile(r"(\w+-?)(?:=?|\s+)(.*?)\s*$")
+RE_OPT_VALUE = re.compile(r"(\w+-?)(?:\s+|=)(.*?)\s*$")
 RE_INDENT = re.compile(r"^\s+")
+
+LOG = sshrc.utils.logger(__name__)
 
 
 def lex(lines):
     tokens = []
 
     for index, line in enumerate(lines):
+        LOG.debug("Process line %d '%s'.", index, line)
         processed_line = process_line(line)
         if processed_line:
-            tokens.append(make_token(processed_line, line, index))
+            token = make_token(processed_line, line, index)
+            LOG.debug("Processed line %d to token %s", index, token)
+            tokens.append(token)
+        else:
+            LOG.debug("Processed line %d is empty, skip.", index)
 
     tokens = verify_tokens(tokens)
+
+    LOG.info("Lexing is finished. Got %d tokens.", len(tokens))
 
     return tokens
 
@@ -68,12 +78,18 @@ def verify_tokens(tokens):
         raise exceptions.LexerIncorrectFirstIndentationError(
             tokens[0].original, tokens[0].lineno)
 
+    LOG.debug("Verify %d tokens.", len(tokens))
+
     current_level = 0
     for token in tokens:
         if token.indent - current_level >= 2:
+            LOG.debug("Token %s has incorrect indentation. "
+                      "Previous level is %d.", token, current_level)
             raise exceptions.LexerIncorrectIndentationError(
                 token.original, token.lineno)
         current_level = token.indent
+
+    LOG.debug("All %d tokens are fine.", len(tokens))
 
     return tokens
 

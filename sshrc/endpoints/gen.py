@@ -26,19 +26,39 @@ def main():
     options = get_options()
     sshrc.utils.configure_logging(debug=options.debug)
 
-    LOG.debug("GGG")
-    LOG.error("WWW2")
+    LOG.debug("Options are %s", options)
 
     try:
         content = sshrc.utils.get_content(options.source_path)
     except Exception as exc:
+        LOG.error("Cannot parse source file %s: %s", options.source_path, exc)
         return os.EX_SOFTWARE
+    else:
+        LOG.debug("Original content is \n%s", content)
 
     if not options.no_templater:
-        content = sshrc.EXTRAS["templater"].render(content)
+        try:
+            content = sshrc.EXTRAS["templater"].render(content)
+        except Exception as exc:
+            LOG.error("Cannot process template in source file %s. "
+                      "Templater is %s: %s",
+                      options.source_path, ssshrc.EXTRAS["templater"].name,
+                      exc)
+            return os.EX_SOFTWARE
+        else:
+            LOG.debug("Processed template is \n%s", content)
+    else:
+        LOG.debug("No templating is used.")
 
     if not options.boring_syntax:
-        content = sshrc.endpoints.common.parse(content)
+        try:
+            content = sshrc.endpoints.common.parse(content)
+        except Exception as exc:
+            LOG.error("Cannot parse content in source file %s: %s",
+                      options.source_path, exc)
+            return os.EX_SOFTWARE
+    else:
+        LOG.debug("Boring syntax is used.")
 
     add_header = options.add_header
     if add_header is None:
@@ -52,8 +72,12 @@ def main():
     if options.destination_path is None:
         print(content)
     else:
-        with sshrc.utils.topen(options.destination_path, True) as destfp:
-            destfp.write(content)
+        try:
+            with sshrc.utils.topen(options.destination_path, True) as destfp:
+                destfp.write(content)
+        except Exception as exc:
+            LOG.error("Cannot write to file %s: %s",
+                      options.destination_path, exc)
 
     return os.EX_OK
 
