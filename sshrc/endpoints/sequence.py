@@ -61,7 +61,7 @@ def process_syntax(options, content):
     try:
         return sshrc.core.processor.parse(content)
     except Exception as exc:
-        LOG.error("Cannot parse content in source file %s: %s",
+        LOG.exception("Cannot parse content in source file %s: %s",
                   options.source_path, exc)
         raise
 

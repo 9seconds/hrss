@@ -74,11 +74,14 @@ def make_token(line, original_line, index):
 
 
 def verify_tokens(tokens):
+    LOG.debug("Verify %d tokens.", len(tokens))
+
+    if not tokens:
+        return []
+
     if tokens[0].indent:
         raise exceptions.LexerIncorrectFirstIndentationError(
             tokens[0].original, tokens[0].lineno)
-
-    LOG.debug("Verify %d tokens.", len(tokens))
 
     current_level = 0
     for token in tokens:
