@@ -2,14 +2,15 @@
 
 
 import collections
+import os.path
 
 
 Templater = collections.namedtuple("Templater", ["name", "render"])
 
-
-EXTRAS = {
-    "templater": Templater(None, lambda content: content)
-}
+EXTRAS = {"templater": Templater(None, lambda content: content)}
+HOME_DIR = os.path.expanduser("~")
+DEFAULT_SSHRC = os.path.join(HOME_DIR, ".sshrc")
+DEFAULT_SSHCONFIG = os.path.join(HOME_DIR, ".ssh", "config")
 
 
 try:
