@@ -13,13 +13,14 @@ Token = collections.namedtuple(
     "Token",
     ["indent", "option", "values", "original", "lineno"])
 
-RE_QUOTED_SINGLE = r"'(?:[^'\\]|\\.)+'"
-RE_QUOTED_DOUBLE = r'"(?:[^"\\]|\\.)+"'
+RE_QUOTED_SINGLE = r"'(?:[^'\\]|\\.)*'"
+RE_QUOTED_DOUBLE = r'"(?:[^"\\]|\\.)*"'
+RE_UNQUOTED = r"[^\"'](?:[^'\"\\]|\\.)+[^\"']"
 
 RE_COMMENT = re.compile(r"#.*$")
 RE_QUOTED = re.compile(
-    r"(?:{0}|{1}|\S+)".format(RE_QUOTED_SINGLE, RE_QUOTED_DOUBLE))
-RE_OPT_VALUE = re.compile(r"(\w+-?)(?:\s+|=)(.*?)\s*$")
+    r"(?:{0}|{1}|{2})".format(RE_QUOTED_SINGLE, RE_QUOTED_DOUBLE, RE_UNQUOTED))
+RE_OPT_VALUE = re.compile(r"(\w+-?)(?:\s+|=\s*)(.*?[^ \t=].*?)\s*$")
 RE_INDENT = re.compile(r"^\s+")
 
 LOG = sshrc.utils.logger(__name__)
