@@ -6,7 +6,6 @@ python:
   - "3.3"
   - "3.4"
   - "3.5"
-  - "pypy3"
 
 install:
   - pip install -r requirements.txt -r test-requirements.txt
@@ -17,6 +16,10 @@ install:
 script:
   - py.test
   - flake8
+  - radon cc --average --show-closures sshrc
+  - radon raw --summary sshrc
+  - radon mi --show --multi sshrc
+  - xenon -mA -mA -bB sshrc
 
 after_success:
   - coveralls
