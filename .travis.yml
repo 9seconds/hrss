@@ -7,11 +7,14 @@ python:
   - "3.4"
   - "3.5"
 
+before_install:
+  - pip install codecov
+
 install:
   - pip install -r requirements.txt -r test-requirements.txt
   - pip install -U pip setuptools
   - python setup.py develop
-  - pip install coveralls
+  # - pip install coveralls
 
 script:
   - py.test
@@ -22,7 +25,7 @@ script:
   - xenon -mA -mA -bB sshrc
 
 after_success:
-  - coveralls
+  - codecov
 
 notifications:
   email:
