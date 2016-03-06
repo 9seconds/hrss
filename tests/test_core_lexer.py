@@ -18,3 +18,18 @@ import pytest
 ))
 def test_clean_line(input_, output_):
     assert lexer.clean_line(input_) == output_
+
+
+@pytest.mark.parametrize("input_, output_", (
+    ("", ""),
+    ("  ", "  "),
+    ("    ", "    "),
+    ("     ", "     "),
+    ("\t    ", "        "),
+    ("\t\t\t", 12 * " "),
+    ("\t \t", "         "),
+    ("\t\t\t ", "             "),
+    (" \t\t\t ", "              ")
+))
+def test_reindent_line(input_, output_):
+    assert lexer.reindent_line(input_) == output_
