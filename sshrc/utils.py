@@ -1,16 +1,60 @@
 # -*- coding: utf-8 -*-
 
 
+import copy
 import logging
+import logging.config
 import logging.handlers
 import sys
 
 
 LOG_NAMESPACE = "sshrc"
-LOG_FORMAT_DEBUG = "[%(levelname)s] %(name)30s:%(lineno)d - %(message)s"
-LOG_FORMAT_SIMPLE = "%(message)s"
-LOG_FORMAT_SYSLOG = "{}[%(process)d]: {}".format(
-    LOG_NAMESPACE, LOG_FORMAT_SIMPLE)
+
+
+def get_syslog_address():
+    if sys.platform.startswith("linux"):
+        return "/dev/log"
+    elif sys.platform == "darwin":
+        return "/var/run/syslog"
+    else:
+        return "localhost", logging.handlers.SYSLOG_UDP_PORT
+
+
+LOG_CONFIG = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "debug": {
+            "format": "[%(levelname)s] %(name)30s:%(lineno)d %(message)s"
+        },
+        "simple": {
+            "format": "%(message)s"
+        },
+        "syslog": {
+            "format": "{}[%(process)d]: %(message)s".format(LOG_NAMESPACE)
+        }
+    },
+    "handlers": {
+        "stderr": {
+            "level": "ERROR",
+            "class": "logging.StreamHandler",
+            "formatter": "simple"
+        },
+        "syslog": {
+            "level": "INFO",
+            "class": "logging.handlers.SysLogHandler",
+            "formatter": "syslog",
+            "address": get_syslog_address()
+        }
+    },
+    "loggers": {
+        LOG_NAMESPACE: {
+            "handlers": ["syslog"],
+            "level": "DEBUG",
+            "propagate": True
+        }
+    }
+}
 
 
 def topen(filename, write=False):
@@ -28,46 +72,11 @@ def logger(namespace):
 
 
 def configure_logging(debug=False, stderr=True):
-    root_logger = logging.getLogger(LOG_NAMESPACE)
+    config = copy.deepcopy(LOG_CONFIG)
 
-    root_logger.setLevel(logging.DEBUG)
-    root_logger.propagate = False
-    root_logger.handlers = []
-
-    root_logger.addHandler(create_syslog_handler())
     if stderr:
-        root_logger.addHandler(create_stderr_handler(debug))
-
-
-def create_syslog_handler():
-    if sys.platform.startswith("linux"):
-        syslog_address = "/dev/log"
-    elif sys.platform == "darwin":
-        syslog_address = "/var/run/syslog"
-    else:
-        syslog_address = "localhost", logging.handlers.SYSLOG_UDP_PORT
-
-    syslog_formatter = logging.Formatter(LOG_FORMAT_SYSLOG)
-
-    syslog_handler = logging.handlers.SysLogHandler(syslog_address)
-    syslog_handler.setLevel(logging.INFO)
-    syslog_handler.setFormatter(syslog_formatter)
-
-    return syslog_handler
-
-
-def create_stderr_handler(debug):
+        config["loggers"][LOG_NAMESPACE]["handlers"].append("stderr")
     if debug:
-        log_format = LOG_FORMAT_DEBUG
-        level = logging.DEBUG
-    else:
-        log_format = LOG_FORMAT_SIMPLE
-        level = logging.ERROR
+        config["handlers"]["stderr"]["level"] = "DEBUG"
 
-    stderr_formatter = logging.Formatter(log_format)
-
-    stderr_hander = logging.StreamHandler()
-    stderr_hander.setLevel(level)
-    stderr_hander.setFormatter(stderr_formatter)
-
-    return stderr_hander
+    logging.config.dictConfig(config)
