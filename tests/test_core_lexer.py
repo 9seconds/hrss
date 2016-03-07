@@ -151,3 +151,23 @@ def test_regexp_optvalue_ok(text):
 ))
 def test_regexp_optvalue_nok(text):
     assert not lexer.RE_OPT_VALUE.match(text)
+
+
+@pytest.mark.parametrize("input_, output_", (
+    ("", ""),
+    ("a", "a"),
+    (" a", " a"),
+    ("    a", "    a"),
+    ("\ta", "    a"),
+    (" \ta", "     a"),
+    (" \t a", "      a"),
+    (" \t a ", "      a"),
+    (" \t a #sdfds", "      a"),
+    (" \t a #sdfds #", "      a"),
+    ("a\t", "a"),
+    ("a\t\r", "a"),
+    ("a\r", "a"),
+    ("a\n", "a")
+))
+def test_process_line(input_, output_):
+    assert lexer.process_line(input_) == output_
