@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 
+import sshrc.core.exceptions as exceptions
 import sshrc.core.lexer as lexer
 
 import pytest
@@ -171,3 +172,53 @@ def test_regexp_optvalue_nok(text):
 ))
 def test_process_line(input_, output_):
     assert lexer.process_line(input_) == output_
+
+
+@pytest.mark.parametrize("text, indent_len, option, values", (
+    ("\ta 1", 1, "a", "1"),
+    ("\ta 1 2", 1, "a", ["1", "2"]),
+    ("\t\ta 1 2", 2, "a", ["1", "2"]),
+    ("a 1 2 'cv'", 0, "a", ["1", "2", "'cv'"]),
+    ("a 1 2 \"cv\"", 0, "a", ["1", "2", '"cv"']),
+    ("a 1 2 \"cv\" 3", 0, "a", ["1", "2", '"cv"', "3"]),
+    ("\ta=1", 1, "a", "1"),
+    ("\ta =1 2", 1, "a", ["1", "2"]),
+    ("\t\ta= 1 2", 2, "a", ["1", "2"]),
+    ("a = 1 2 'cv'", 0, "a", ["1", "2", "'cv'"])
+))
+def test_make_token_ok(text, indent_len, option, values):
+    processed_line = lexer.process_line(text)
+    token = lexer.make_token(processed_line, text, 1)
+
+    if not isinstance(values, (list, tuple)):
+        values = [values]
+
+    assert token.indent == indent_len
+    assert token.option == option
+    assert token.values == values
+    assert token.original == text
+
+
+@pytest.mark.parametrize("text", (
+    "",
+    "a",
+    "a=",
+    "a =",
+    "a  ",
+    "=",
+    "==",
+    " =asd"
+))
+def test_make_token_incorrect_value(text):
+    with pytest.raises(exceptions.LexerIncorrectOptionValue):
+        lexer.make_token(text, text, 1)
+
+
+@pytest.mark.parametrize("offset", (
+    1, 2, 3, 5, 6, 7
+))
+def test_make_token_incorrect_indentation(offset):
+    text = " " * offset + "a = 1"
+
+    with pytest.raises(exceptions.LexerIncorrectIndentationLength):
+        lexer.make_token(text, text, 1)
