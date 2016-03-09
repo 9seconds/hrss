@@ -7,6 +7,12 @@ import sshrc.core.lexer as lexer
 import pytest
 
 
+def make_token(indent_lvl=0):
+    token_name = "a{0}".format(0)
+
+    return lexer.Token(indent_lvl, token_name, [token_name], token_name, 0)
+
+
 @pytest.mark.parametrize("input_, output_", (
     ("", ""),
     ("       ", ""),
@@ -222,3 +228,43 @@ def test_make_token_incorrect_indentation(offset):
 
     with pytest.raises(exceptions.LexerIncorrectIndentationLength):
         lexer.make_token(text, text, 1)
+
+
+def test_verify_tokens_empty():
+    assert lexer.verify_tokens([]) == []
+
+
+def test_verify_tokens_one_token():
+    token = make_token(indent_lvl=0)
+
+    assert lexer.verify_tokens([token]) == [token]
+
+
+@pytest.mark.parametrize("level", list(range(1, 4)))
+def test_verify_tokens_one_token_incorrect_level(level):
+    token = make_token(indent_lvl=level)
+
+    with pytest.raises(exceptions.LexerIncorrectFirstIndentationError):
+        assert lexer.verify_tokens([token]) == [token]
+
+
+def test_verify_tokens_ladder_level():
+    tokens = [make_token(indent_lvl=level) for level in range(5)]
+
+    assert lexer.verify_tokens(tokens) == tokens
+
+
+@pytest.mark.parametrize("level", list(range(2, 7)))
+def test_verify_tokens_big_level_gap(level):
+    tokens = [make_token(indent_lvl=0), make_token(indent_lvl=level)]
+
+    with pytest.raises(exceptions.LexerIncorrectIndentationError):
+        assert lexer.verify_tokens(tokens) == tokens
+
+
+@pytest.mark.parametrize("level", list(range(5)))
+def test_verify_tokens_dedent(level):
+    tokens = [make_token(indent_lvl=lvl) for lvl in range(5)]
+    tokens.append(make_token(indent_lvl=level))
+
+    assert lexer.verify_tokens(tokens) == tokens
