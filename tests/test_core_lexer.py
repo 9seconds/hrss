@@ -268,3 +268,67 @@ def test_verify_tokens_dedent(level):
     tokens.append(make_token(indent_lvl=level))
 
     assert lexer.verify_tokens(tokens) == tokens
+
+
+def test_verify_tokens_lex_ok():
+    text = """\
+aa = 1
+b 1
+
+
+    q = 2
+    c = 3  # q
+        d = 5 'aa' "sdx" xx 3   3
+
+e = 3
+    """.strip()
+
+    tokens = lexer.lex(text.split("\n"))
+
+    assert len(tokens) == 6
+
+    assert tokens[0].indent == 0
+    assert tokens[0].option == "aa"
+    assert tokens[0].values == ["1"]
+    assert tokens[0].original == "aa = 1"
+    assert tokens[0].lineno == 1
+
+    assert tokens[1].indent == 0
+    assert tokens[1].option == "b"
+    assert tokens[1].values == ["1"]
+    assert tokens[1].original == "b 1"
+    assert tokens[1].lineno == 2
+
+    assert tokens[2].indent == 1
+    assert tokens[2].option == "q"
+    assert tokens[2].values == ["2"]
+    assert tokens[2].original == "    q = 2"
+    assert tokens[2].lineno == 5
+
+    assert tokens[3].indent == 1
+    assert tokens[3].option == "c"
+    assert tokens[3].values == ["3"]
+    assert tokens[3].original == "    c = 3  # q"
+    assert tokens[3].lineno == 6
+
+    assert tokens[4].indent == 2
+    assert tokens[4].option == "d"
+    assert tokens[4].values == ["5", "'aa'", '"sdx"', "xx", "3", "3"]
+    assert tokens[4].original == "        d = 5 'aa' \"sdx\" xx 3   3"
+    assert tokens[4].lineno == 7
+
+    assert tokens[5].indent == 0
+    assert tokens[5].option == "e"
+    assert tokens[5].values == ["3"]
+    assert tokens[5].original == "e = 3"
+    assert tokens[5].lineno == 9
+
+
+def test_lex_incorrect_first_indentation():
+    text = """\
+    a = 1
+b = 3
+"""
+
+    with pytest.raises(exceptions.LexerIncorrectFirstIndentationError):
+        lexer.lex(text.split("\n"))

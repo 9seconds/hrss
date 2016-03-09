@@ -29,7 +29,7 @@ LOG = sshrc.utils.logger(__name__)
 def lex(lines):
     tokens = []
 
-    for index, line in enumerate(lines):
+    for index, line in enumerate(lines, start=1):
         LOG.debug("Process line %d '%s'.", index, line)
         processed_line = process_line(line)
         if processed_line:
