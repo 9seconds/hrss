@@ -108,7 +108,9 @@ def test_hosts_names():
 def test_beat_coverage():
     root = parser.Host("root", None)
     repr(root)
+    str(root)
 
     for name in "child1", "child2", "child0":
         host = root.add_host(name)
     repr(root)
+    str(root)

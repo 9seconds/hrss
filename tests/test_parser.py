@@ -4,6 +4,7 @@
 import pytest
 
 import sshrc.core.lexer as lexer
+import sshrc.core.exceptions as exceptions
 import sshrc.core.parser as parser
 
 
@@ -128,5 +129,50 @@ Host *
     mxqex_host = mx_host.hosts[0]
     assert mxqex_host.trackable
     assert mxqex_host.fullname == "mxqex"
-    assert mxqex_host.options == {"SendEnv": "12", "Port": "35", "ProxyCommand": "ssh -W %h:%p env312"}
+    assert mxqex_host.options == {"SendEnv": "12", "Port": "35",
+                                  "ProxyCommand": "ssh -W %h:%p env312"}
     assert mxqex_host.hosts == []
+
+
+def test_parse_options_star_host_invariant():
+    no_star_host = """\
+Compression yes
+CompressionLevel 6
+    """.strip()
+
+    star_host = """\
+Compression yes
+
+Host *
+    CompressionLevel 6
+    """.strip()
+
+    star_host_only = """\
+Host *
+    Compression yes
+    CompressionLevel 6
+    """.strip()
+
+    no_star_host = parser.parse(lexer.lex(no_star_host.split("\n")))
+    star_host = parser.parse(lexer.lex(star_host.split("\n")))
+    star_host_only = parser.parse(lexer.lex(star_host_only.split("\n")))
+
+    assert no_star_host.struct == star_host.struct
+    assert no_star_host.struct == star_host_only.struct
+
+
+@pytest.mark.parametrize("empty_lines", list(range(5)))
+def test_nothing_to_parse(empty_lines):
+    root = parser.parse(lexer.lex([""] * empty_lines))
+
+    assert len(root.hosts) == 1
+    assert root.hosts[0].fullname == "*"
+    assert root.hosts[0].options == {}
+    assert root.hosts[0].hosts == []
+
+
+def test_unknown_option():
+    tokens = lexer.lex(["ASDF 1"])
+
+    with pytest.raises(exceptions.ParserUnknownOption):
+        parser.parse(tokens)
