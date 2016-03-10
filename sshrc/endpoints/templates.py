@@ -65,6 +65,12 @@ def make_systemd_instruction(**kwargs):
                                              SYSTEMD_SERVICE_NAME)
     systemd_config = make_systemd(**kwargs)
 
+    yield 'mkdir -p "{0}"'.format(systemd_user_path)
+    yield 'cat > "{0}" <<EOF\n{1}\nEOF'.format(systemd_user_service_path,
+                                               systemd_config.strip())
+    yield "systemctl --user enable {0}".format(SYSTEMD_SERVICE_NAME)
+    yield "systemctl --user start {0}".format(SYSTEMD_SERVICE_NAME)
+
     return SYSTEMD_INSTRUCTIONS.format(
         systemd_user_path=systemd_user_path,
         systemd_user_service_path=systemd_user_service_path,

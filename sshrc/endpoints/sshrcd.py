@@ -24,6 +24,11 @@ def main():
         help="Print out instruction to set daemon with systemd.",
         action="store_true",
         default=False)
+    options.add_argument(
+        "--curlsh",
+        help="I do not care and want simple install.",
+        action="store_true",
+        default=False)
     options = options.parse_args()
 
     sshrc.utils.configure_logging(debug=options.debug)
