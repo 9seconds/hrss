@@ -96,7 +96,7 @@ def test_hosts_names():
     root = parser.Host("root", None)
 
     for name in "child1", "child2", "child0":
-        host = root.add_host(name)
+        root.add_host(name)
 
     names = [host.name for host in root.childs]
     host_names = [host.name for host in root.hosts]
@@ -111,6 +111,6 @@ def test_beat_coverage():
     str(root)
 
     for name in "child1", "child2", "child0":
-        host = root.add_host(name)
+        root.add_host(name)
     repr(root)
     str(root)

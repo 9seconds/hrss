@@ -3,8 +3,8 @@
 
 import pytest
 
-import sshrc.core.lexer as lexer
 import sshrc.core.exceptions as exceptions
+import sshrc.core.lexer as lexer
 import sshrc.core.parser as parser
 
 
@@ -93,12 +93,12 @@ Host *
                                "User": "root"}
     assert len(me_host.hosts) == 1
 
-    meWWW_host = me_host.hosts[0]
-    assert meWWW_host.trackable
-    assert meWWW_host.fullname == "meWWW"
-    assert meWWW_host.options == {"Port": "22", "TCPKeepAlive": "5",
+    mewww_host = me_host.hosts[0]
+    assert mewww_host.trackable
+    assert mewww_host.fullname == "meWWW"
+    assert mewww_host.options == {"Port": "22", "TCPKeepAlive": "5",
                                   "HostName": "env10", "User": "root"}
-    assert meWWW_host.hosts == []
+    assert mewww_host.hosts == []
 
     mq_host = m_host.hosts[1]
     assert mq_host.trackable
@@ -113,12 +113,12 @@ Host *
                                "User": "root"}
     assert len(mv_host.hosts) == 1
 
-    mvWWW_host = mv_host.hosts[0]
-    assert mvWWW_host.trackable
-    assert mvWWW_host.fullname == "mvWWW"
-    assert mvWWW_host.options == {"Port": "22", "TCPKeepAlive": "5",
+    mvwww_host = mv_host.hosts[0]
+    assert mvwww_host.trackable
+    assert mvwww_host.fullname == "mvWWW"
+    assert mvwww_host.options == {"Port": "22", "TCPKeepAlive": "5",
                                   "HostName": "env10", "User": "root"}
-    assert mvWWW_host.hosts == []
+    assert mvwww_host.hosts == []
 
     mx_host = m_host.hosts[3]
     assert not mx_host.trackable
