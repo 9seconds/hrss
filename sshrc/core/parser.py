@@ -169,7 +169,7 @@ def parse_options(root, tokens):
         token = tokens.popleft()
         LOG.debug("Process token %s for root %s.", token, root)
 
-        if token.option in ("Host", "Host-"):
+        if token.option in ("Host", "-Host"):
             LOG.debug("Token %s is host token", token)
 
             host_tokens = get_host_tokens(current_level, tokens)
@@ -225,4 +225,4 @@ def get_host_tokens(level, tokens):
 
 
 def is_trackable_host(name):
-    return name != "Host-"
+    return name != "-Host"
