@@ -66,29 +66,3 @@ def make_systemd_script():
                                                systemd_config.strip())
     yield "systemctl --user enable {0}".format(SYSTEMD_SERVICE_NAME)
     yield "systemctl --user start {0}".format(SYSTEMD_SERVICE_NAME)
-
-
-def make_systemd(**kwargs):
-    return SYSTEMD_CONFIG.format(
-        command=distutils.spawn.find_executable(sys.argv[0]),
-        sshrc=sshrc.DEFAULT_SSHCONFIG)
-
-
-def make_systemd_instruction(**kwargs):
-    systemd_user_path = os.path.join(sshrc.HOME_DIR, ".config", "systemd",
-                                     "user")
-    systemd_user_service_path = os.path.join(systemd_user_path,
-                                             SYSTEMD_SERVICE_NAME)
-    systemd_config = make_systemd(**kwargs)
-
-    yield 'mkdir -p "{0}"'.format(systemd_user_path)
-    yield 'cat > "{0}" <<EOF\n{1}\nEOF'.format(systemd_user_service_path,
-                                               systemd_config.strip())
-    yield "systemctl --user enable {0}".format(SYSTEMD_SERVICE_NAME)
-    yield "systemctl --user start {0}".format(SYSTEMD_SERVICE_NAME)
-
-    return SYSTEMD_INSTRUCTIONS.format(
-        systemd_user_path=systemd_user_path,
-        systemd_user_service_path=systemd_user_service_path,
-        service_name=SYSTEMD_SERVICE_NAME,
-        systemd_config=systemd_config)
