@@ -70,7 +70,7 @@ class Daemon(sshrc.endpoints.common.App):
                 except Exception:
                     return os.EX_SOFTWARE
 
-                LOG.info("Managed config. Going to the next loop.")
+                LOG.info("Config was managed. Going to the next loop.")
 
 
 main = sshrc.endpoints.common.main(Daemon)
