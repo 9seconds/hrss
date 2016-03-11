@@ -30,6 +30,9 @@ LOG_CONFIG = {
         "simple": {
             "format": "%(message)s"
         },
+        "verbose": {
+            "format": "[%(levelname)s] %(message)s"
+        },
         "syslog": {
             "format": "{}[%(process)d]: %(message)s".format(LOG_NAMESPACE)
         }
@@ -79,6 +82,11 @@ def configure_logging(debug=False, verbose=True, stderr=True):
             handler["level"] = "INFO"
         if debug:
             handler["level"] = "DEBUG"
+
+    if verbose:
+        config["handlers"]["stderr"]["formatter"] = "verbose"
+    if debug:
+        config["handlers"]["stderr"]["formatter"] = "debug"
 
     if stderr:
         config["loggers"][LOG_NAMESPACE]["handlers"].append("stderr")
