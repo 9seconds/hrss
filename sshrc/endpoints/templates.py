@@ -52,6 +52,22 @@ def make_header(**kwargs):
         sshrc_file=kwargs.get("sshrc_file", "???"))
 
 
+def make_systemd_script():
+    systemd_user_path = os.path.join(sshrc.HOME_DIR, ".config", "systemd",
+                                     "user")
+    systemd_user_service_path = os.path.join(systemd_user_path,
+                                             SYSTEMD_SERVICE_NAME)
+    systemd_config = SYSTEMD_CONFIG.format(
+        command=distutils.spawn.find_executable(sys.argv[0]),
+        sshrc=sshrc.DEFAULT_SSHCONFIG)
+
+    yield 'mkdir -p "{0}" || true'.format(systemd_user_path)
+    yield 'cat > "{0}" <<EOF\n{1}\nEOF'.format(systemd_user_service_path,
+                                               systemd_config.strip())
+    yield "systemctl --user enable {0}".format(SYSTEMD_SERVICE_NAME)
+    yield "systemctl --user start {0}".format(SYSTEMD_SERVICE_NAME)
+
+
 def make_systemd(**kwargs):
     return SYSTEMD_CONFIG.format(
         command=distutils.spawn.find_executable(sys.argv[0]),

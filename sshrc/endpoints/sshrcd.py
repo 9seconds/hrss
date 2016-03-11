@@ -8,58 +8,72 @@ import sys
 
 import inotify_simple
 
-import sshrc.endpoints.cli
-import sshrc.endpoints.sequence
-import sshrc.endpoints.templates
+import sshrc.endpoints.common
 import sshrc.utils
 
 
 LOG = sshrc.utils.logger(__name__)
 
 
-def main():
-    options = sshrc.endpoints.cli.create_parser()
-    options.add_argument(
-        "--systemd",
-        help="Print out instruction to set daemon with systemd.",
-        action="store_true",
-        default=False)
-    options.add_argument(
-        "--curlsh",
-        help="I do not care and want simple install.",
-        action="store_true",
-        default=False)
-    options = options.parse_args()
+class Daemon(sshrc.endpoints.common.App):
 
-    sshrc.utils.configure_logging(debug=options.debug)
+    @classmethod
+    def specify_parser(cls, parser):
+        parser.add_argument(
+            "--systemd",
+            help="Printout instructions to set deamon with systemd.",
+            action="store_true",
+            default=False)
+        parser.add_argument(
+            "--curlsh",
+            help="I do not care and want curl | sh.",
+            action="store_true",
+            default=False)
 
-    LOG.debug("Options are %s", options)
+        return parser
 
-    if options.systemd:
-        print(sshrc.endpoints.templates.make_systemd_instruction())
-        return os.EX_OK
+    def __init__(self, options):
+        super(Daemon, self).__init__(options)
 
-    return track(options)
+        self.systemd = options.systemd
+        self.curlsh = options.curlsh
+
+    def do(self):
+        if not self.systemd:
+            return self.track()
+
+        script = sshrc.endpoints.templates.make_systemd_script()
+
+        if not self.curlsh:
+            script = [
+                "Please execute following lines or compose script:",
+                ""] + ["$ {0}".format(line) for line in script]
+
+        print("\n".join(script))
+
+    def track(self):
+        with inotify_simple.INotify() as notify:
+            notify.add_watch(
+                self.source_path,
+                inotify_simple.flags.MODIFY | inotify_simple.flags.CREATE)
+
+            while True:
+                try:
+                    events = notify.read()
+                except KeyboardInterrupt:
+                    return os.EX_OK
+
+                LOG.debug("Got %d events. First is %s", len(events), events[0])
+
+                try:
+                    self.output()
+                except Exception:
+                    return os.EX_SOFTWARE
+
+                LOG.info("Managed config. Going to the next loop.")
 
 
-def track(options):
-    with inotify_simple.INotify() as notify:
-        notify.add_watch(
-            options.source_path,
-            inotify_simple.flags.MODIFY | inotify_simple.flags.CREATE)
-
-        while True:
-            try:
-                events = notify.read()
-            except KeyboardInterrupt:
-                return os.EX_OK
-
-            LOG.debug("Got %d events. First is %s", len(events), events[0])
-
-            try:
-                sshrc.endpoints.sequence.process_sequence(options)
-            except Exception:
-                return os.EX_SOFTWARE
+main = sshrc.endpoints.common.main(Daemon)
 
 
 if __name__ == "__main__":

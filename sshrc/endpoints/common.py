@@ -133,11 +133,9 @@ def main(app_class):
         app = app_class(options)
 
         try:
-            app.do()
+            return app.do()
         except Exception:
             return os.EX_SOFTWARE
-
-        return os.EX_OK
 
     return main_func
 
