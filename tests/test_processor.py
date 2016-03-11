@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 
 
-import pytest
-
 import sshrc.core.lexer as lexer
 import sshrc.core.parser as parser
 import sshrc.core.processor as process
@@ -47,9 +45,8 @@ def test_generate():
         "    Compression yes",
         ""]
 
-def test_process():
-    content = process.process(CONTENT)
 
+def test_process():
     assert process.process(CONTENT) == """\
 Host qeh
     HostName hew
