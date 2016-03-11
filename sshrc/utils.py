@@ -41,7 +41,7 @@ LOG_CONFIG = {
             "formatter": "simple"
         },
         "syslog": {
-            "level": "INFO",
+            "level": "ERROR",
             "class": "logging.handlers.SysLogHandler",
             "formatter": "syslog",
             "address": get_syslog_address()
@@ -71,12 +71,16 @@ def logger(namespace):
     return logging.getLogger(LOG_NAMESPACE + "." + namespace)
 
 
-def configure_logging(debug=False, stderr=True):
+def configure_logging(debug=False, verbose=True, stderr=True):
     config = copy.deepcopy(LOG_CONFIG)
+
+    for handler in config["handlers"].values():
+        if verbose:
+            handler["level"] = "INFO"
+        if debug:
+            handler["level"] = "DEBUG"
 
     if stderr:
         config["loggers"][LOG_NAMESPACE]["handlers"].append("stderr")
-    if debug:
-        config["handlers"]["stderr"]["level"] = "DEBUG"
 
     logging.config.dictConfig(config)

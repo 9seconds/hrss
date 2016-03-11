@@ -10,13 +10,54 @@ import sshrc.utils
 LOG = sshrc.utils.logger(__name__)
 
 
+class App(object):
+
+    def __init__(self, debug,, source_path, destination_path,
+                 boring_syntax, add_header, no_templater=False):
+        self.debug = debug
+        self.source_path = source_path
+        self.destination_path = destination_path
+        self.boring_syntax = boring_syntax
+        self.add_header = add_header
+        self.no_templater = no_templater
+
+    def process(self):
+        content = self.get_content()
+
+        if not self.no_templater:
+            content = self.apply_template(content)
+        else:
+            LOG.debug("No templating is used.")
+        if self.boring_syntax:
+            content = self.parse_syntax(content)
+        if self.add_header:
+            content = self.attach_header(content)
+
+        self.output(content)
+
+    def get_content(self):
+        LOG.debug("Fetch content from %s", self.source_path)
+
+        try:
+            content = sshrc.utils.get_content(self.source_path)
+        except Exception as exc:
+            LOG.error("Cannot fetch source file %s: %s", self.source_path, exc)
+            raise
+        else:
+            LOG.debug("Original content of %s is:\n%s", self.source_path,
+                      content)
+
+        return content
+
+
+
+
 def process_sequence(options):
-    sequence = (
+    sequence = [
         get_content,
         apply_template,
         process_syntax,
-        add_header,
-        print_content)
+        add_header]
 
     content = options.source_path
     for func in sequence:

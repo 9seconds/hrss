@@ -14,6 +14,11 @@ def create_parser():
         action="store_true",
         default=False)
     parser.add_argument(
+        "-v", "--verbose",
+        help="Run %(prog)s in verbose mode.",
+        action="store_true",
+        default=False)
+    parser.add_argument(
         "-s", "--source-path",
         help="Path of sshrc. Default is {}".format(sshrc.DEFAULT_SSHRC),
         default=sshrc.DEFAULT_SSHRC)

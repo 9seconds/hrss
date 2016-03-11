@@ -29,6 +29,8 @@ LOG = sshrc.utils.logger(__name__)
 def lex(lines):
     tokens = []
 
+    LOG.info("Start lexing of %d lines.", len(lines))
+
     for index, line in enumerate(lines, start=1):
         LOG.debug("Process line %d '%s'.", index, line)
         processed_line = process_line(line)
@@ -75,7 +77,7 @@ def make_token(line, original_line, index):
 
 
 def verify_tokens(tokens):
-    LOG.debug("Verify %d tokens.", len(tokens))
+    LOG.info("Verify %d tokens.", len(tokens))
 
     if not tokens:
         return []
@@ -87,13 +89,13 @@ def verify_tokens(tokens):
     current_level = 0
     for token in tokens:
         if token.indent - current_level >= 2:
-            LOG.debug("Token %s has incorrect indentation. "
-                      "Previous level is %d.", token, current_level)
+            LOG.warning("Token %s has incorrect indentation. "
+                        "Previous level is %d.", token, current_level)
             raise exceptions.LexerIncorrectIndentationError(
                 token.original, token.lineno)
         current_level = token.indent
 
-    LOG.debug("All %d tokens are fine.", len(tokens))
+    LOG.info("All %d tokens are fine.", len(tokens))
 
     return tokens
 
