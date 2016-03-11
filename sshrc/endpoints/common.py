@@ -138,6 +138,3 @@ def main(app_class):
             return os.EX_SOFTWARE
 
     return main_func
-
-
-check = main(CheckApp)
