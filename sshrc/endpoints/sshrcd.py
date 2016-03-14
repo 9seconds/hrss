@@ -33,7 +33,7 @@ class Daemon(sshrc.endpoints.common.App):
         return parser
 
     def __init__(self, options):
-        super(Daemon, self).__init__(options)
+        super().__init__(options)
 
         self.systemd = options.systemd
         self.curlsh = options.curlsh
