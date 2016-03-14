@@ -35,6 +35,11 @@ def have_mocked(request, *mock_args, **mock_kwargs):
     return mocked
 
 
+@pytest.fixture
+def mock_get_content(request):
+    return have_mocked(request, "sshrc.utils.get_content")
+
+
 @pytest.fixture(scope="session", autouse=True)
 def mock_logger(request):
     return have_mocked(request, "sshrc.utils.logger")

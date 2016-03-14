@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
 
+import pytest
+
 import sshrc
 import sshrc.endpoints.cli as cli
 
@@ -22,6 +24,7 @@ def test_parser_default(cliargs_default, templater):
         assert not hasattr(parsed, "no_templater")
 
 
+@pytest.mark.longrun
 def test_parser_option_fullset(cliargs_fullset, templater):
     _, options = cliargs_fullset
 

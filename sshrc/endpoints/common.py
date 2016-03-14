@@ -107,6 +107,7 @@ class App(metaclass=abc.ABCMeta):
         except Exception as exc:
             LOG.error("Cannot parse content of source file %s: %s",
                       self.source_path, exc)
+            raise
 
     def attach_header(self, content):
         header = sshrc.endpoints.templates.make_header(
