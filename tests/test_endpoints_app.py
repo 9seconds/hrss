@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
 
+import os
+
 import pytest
 
 import sshrc
@@ -170,6 +172,29 @@ Host q
         assert filefp.read()
 
 
+def test_output_file_exception(monkeypatch, cliargs_default, ptmpdir,
+                               templater, mock_get_content):
+    def write_fail(*args, **kwargs):
+        raise Exception
+
+    monkeypatch.setattr("sshrc.utils.topen", write_fail)
+    mock_get_content.return_value = """\
+Compression yes
+
+Host q
+    HostName e
+
+    Host b
+        HostName lalala
+    """
+
+    app = get_app()
+    app.destination_path = ptmpdir.join("config").strpath
+
+    with pytest.raises(Exception):
+        app.output()
+
+
 @pytest.mark.longrun
 def test_create_app(cliargs_fullset, templater, mock_log_configuration):
     _, options = cliargs_fullset
@@ -202,3 +227,28 @@ def test_create_app(cliargs_fullset, templater, mock_log_configuration):
         assert not app.no_templater
 
     assert mock_log_configuration.called
+
+
+def test_mainfunc_ok(cliargs_default, templater, mock_get_content):
+    mock_get_content.return_value = """\
+Compression yes
+
+Host q
+    HostName e
+
+    Host b
+        HostName lalala
+    """
+
+    main = sshrc.endpoints.common.main(SimpleApp)
+    result = main()
+
+    assert result is None or result == os.EX_OK
+
+
+def test_mainfunc_exception(cliargs_default, templater, mock_get_content):
+    mock_get_content.side_effect = Exception
+
+    main = sshrc.endpoints.common.main(SimpleApp)
+
+    assert main() != os.EX_OK

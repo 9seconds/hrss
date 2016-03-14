@@ -117,12 +117,6 @@ class App(metaclass=abc.ABCMeta):
         return content
 
 
-class CheckApp(App):
-
-    def do(self):
-        return self.output()
-
-
 def main(app_class):
     def main_func():
         parser = sshrc.endpoints.cli.create_parser()
