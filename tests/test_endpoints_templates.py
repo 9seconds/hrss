@@ -6,12 +6,12 @@ import pytest
 import sshrc.endpoints.templates as templates
 
 
-@pytest.mark.parametrize("filename", (
-    None, "filename"
-))
-@pytest.mark.parametrize("date", (
-    None, "2016"
-))
+@pytest.mark.parametrize(
+    "filename", (
+        None, "filename"))
+@pytest.mark.parametrize(
+    "date", (
+        None, "2016"))
 def test_make_header(filename, date):
     kwargs = {}
 

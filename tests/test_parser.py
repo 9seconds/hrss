@@ -161,7 +161,8 @@ Host *
     assert no_star_host.struct == star_host_only.struct
 
 
-@pytest.mark.parametrize("empty_lines", list(range(5)))
+@pytest.mark.parametrize(
+    "empty_lines", list(range(5)))
 def test_nothing_to_parse(empty_lines):
     root = parser.parse(lexer.lex([""] * empty_lines))
 

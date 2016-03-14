@@ -6,15 +6,15 @@ import pytest
 import sshrc.core.parser as parser
 
 
-@pytest.mark.parametrize("name", (
-    "", "name"
-))
-@pytest.mark.parametrize("parent", (
-    None, "", object()
-))
-@pytest.mark.parametrize("trackable", (
-    True, False
-))
+@pytest.mark.parametrize(
+    "name", (
+        "", "name"))
+@pytest.mark.parametrize(
+    "parent", (
+        None, "", object()))
+@pytest.mark.parametrize(
+    "trackable", (
+        True, False))
 def test_init(name, parent, trackable):
     obj = parser.Host(name, parent, trackable)
 

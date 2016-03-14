@@ -27,9 +27,9 @@ def test_topen_write_ok(ptmpdir):
         assert filefp.read() == "1"
 
 
-@pytest.mark.parametrize("content", (
-    "1", "", "TEST"
-))
+@pytest.mark.parametrize(
+    "content", (
+        "1", "", "TEST"))
 def test_get_content(ptmpdir, content):
     filename = ptmpdir.join("test")
     filename.write_text(content, "utf-8")
@@ -37,13 +37,13 @@ def test_get_content(ptmpdir, content):
     assert utils.get_content(filename.strpath) == content
 
 
-@pytest.mark.parametrize("name, address", (
-    ("linux", "/dev/log"),
-    ("linux2", "/dev/log"),
-    ("linux3", "/dev/log"),
-    ("darwin", "/var/run/syslog"),
-    ("windows", ("localhost", 514))
-))
+@pytest.mark.parametrize(
+    "name, address", (
+        ("linux", "/dev/log"),
+        ("linux2", "/dev/log"),
+        ("linux3", "/dev/log"),
+        ("darwin", "/var/run/syslog"),
+        ("windows", ("localhost", 514))))
 def test_get_syslog_address(monkeypatch, name, address):
     monkeypatch.setattr("sys.platform", name)
 
