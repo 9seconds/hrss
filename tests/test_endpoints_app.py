@@ -134,7 +134,7 @@ Host q
             assert not result.startswith("#")
 
 
-def test_output_stdout(monkeypatch, cliargs_default, templater,
+def test_output_stdout(capfd, monkeypatch, cliargs_default, templater,
                        mock_get_content):
     mock_get_content.return_value = """\
 Compression yes
@@ -150,6 +150,20 @@ Host q
     app.destination_path = None
 
     app.output()
+
+    out, err = capfd.readouterr()
+    assert out == """\
+Host qb
+    HostName lalala
+
+Host q
+    HostName e
+
+Host *
+    Compression yes
+
+"""
+    assert not err
 
 
 def test_output_file(cliargs_default, ptmpdir, templater, mock_get_content):

@@ -65,10 +65,7 @@ class Daemon(sshrc.endpoints.common.App):
 
                 LOG.debug("Got %d events. First is %s", len(events), events[0])
 
-                try:
-                    self.output()
-                except Exception:
-                    return os.EX_SOFTWARE
+                self.output()
 
                 LOG.info("Config was managed. Going to the next loop.")
 

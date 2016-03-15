@@ -81,6 +81,25 @@ def templater(request, monkeypatch):
     return templater
 
 
+@pytest.fixture
+def inotifier(request):
+    mock = have_mocked(request, "inotify_simple.INotify")
+    mock.return_value = mock
+    mock.__enter__.return_value = mock
+
+    values = [True] * 3
+
+    def side_effect():
+        if values:
+            return [values.pop()]
+        raise KeyboardInterrupt
+
+    mock.read.side_effect = side_effect
+    mock.v = values
+
+    return mock
+
+
 @pytest.fixture(params=(None, "-d", "--debug"))
 def cliparam_debug(request):
     return request.param
@@ -113,6 +132,16 @@ def cliparam_add_header(request):
 
 @pytest.fixture(params=(None, "-t", "--no-templater"))
 def cliparam_no_templater(request):
+    return request.param
+
+
+@pytest.fixture(params=(None, "--systemd"))
+def cliparam_systemd(request):
+    return request.param
+
+
+@pytest.fixture(params=(None, "--curlsh"))
+def cliparam_curlsh(request):
     return request.param
 
 
@@ -153,3 +182,32 @@ def cliargs_fullset(sysargv, templater, cliparam_debug, cliparam_verbose,
         sysargv.append(cliparam_no_templater)
 
     return sysargv, options
+
+
+@pytest.fixture
+def cliargs_sshrcd_fullset(cliargs_fullset, cliparam_systemd, cliparam_curlsh):
+    sysargv, options = cliargs_fullset
+
+    for param in cliparam_systemd, cliparam_curlsh:
+        if param:
+            sysargv.append(param)
+
+    options["systemd"] = cliparam_systemd
+    options["curlsh"] = cliparam_curlsh
+
+    return sysargv, options
+
+
+@pytest.fixture
+def mock_mainfunc(cliargs_default, mock_get_content, templater, inotifier):
+    mock_get_content.return_value = """\
+Compression yes
+
+Host q
+    HostName e
+
+    Host b
+        HostName lalala
+    """
+
+    return cliargs_default, mock_get_content, templater, inotifier
