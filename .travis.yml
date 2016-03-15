@@ -17,7 +17,7 @@ install:
   # - pip install coveralls
 
 script:
-  - py.test
+  - py.test --cov-fail-under 90
   - flake8
   - radon cc --average --show-closures sshrc
   - radon raw --summary sshrc

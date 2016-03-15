@@ -48,3 +48,17 @@ def test_get_syslog_address(monkeypatch, name, address):
     monkeypatch.setattr("sys.platform", name)
 
     assert utils.get_syslog_address() == address
+
+
+@pytest.mark.parametrize(
+    "debug", (
+        True, False))
+@pytest.mark.parametrize(
+    "verbose", (
+        True, False))
+@pytest.mark.parametrize(
+    "stderr", (
+        True, False))
+@pytest.mark.no_mock_log_configuration
+def test_configure_logging(debug, verbose, stderr):
+    utils.configure_logging(debug, verbose, stderr)
