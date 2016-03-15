@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 
 
-import pytest
-
 import sshrc
 import sshrc.endpoints.cli as cli
 

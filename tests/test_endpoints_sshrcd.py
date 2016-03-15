@@ -3,8 +3,8 @@
 
 import os
 
-import pytest
 import inotify_simple
+import pytest
 
 import sshrc
 import sshrc.endpoints.cli as cli
