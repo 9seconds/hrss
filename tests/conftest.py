@@ -47,7 +47,8 @@ def mock_logger(request):
 
 @pytest.fixture(autouse=True)
 def mock_log_configuration(request):
-    have_mocked(request, "logging.handlers.SysLogHandler")
+    have_mocked(request, "socket.socket")  # required for SysLogHandler
+
     marker = request.node.get_marker("no_mock_log_configuration")
 
     if not marker:
