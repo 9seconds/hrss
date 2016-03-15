@@ -31,5 +31,7 @@ def flat(tree):
 def flat_host_data(tree):
     for host in tree.hosts:
         yield from flat_host_data(host)
+
     if tree.trackable:
-        yield tree
+        if not (tree.fullname == "*" and not tree.options):
+            yield tree

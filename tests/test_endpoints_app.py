@@ -69,7 +69,7 @@ Host n
     app = get_app()
     assert app.process_syntax(content) == (
         "Host n\n"
-        "    ProxyCommand ssh -W %h:%p x\n\nHost *\n")
+        "    ProxyCommand ssh -W %h:%p x\n")
 
 
 def test_process_syntax_exception(cliargs_default):
