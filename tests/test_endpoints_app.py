@@ -266,3 +266,13 @@ def test_mainfunc_exception(cliargs_default, templater, mock_get_content):
     main = concierge.endpoints.common.main(SimpleApp)
 
     assert main() != os.EX_OK
+
+
+def test_mainfunc_keyboardinterrupt(cliargs_default, templater,
+                                    mock_get_content):
+    mock_get_content.side_effect = KeyboardInterrupt
+
+    main = concierge.endpoints.common.main(SimpleApp)
+    result = main()
+
+    assert result is None or result == os.EX_OK
