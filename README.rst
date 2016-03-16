@@ -1,10 +1,10 @@
-sshrc
-*****
+concierge
+*********
 
 |PyPI| |Build Status| |Code Coverage|
 
-``sshrc`` is a small utility/deamon which is intended to help humans to
-maintain their SSH configs.
+``concierge`` is a small utility/deamon which is intended to help humans
+to maintain their SSH configs.
 
 .. contents::
     :depth: 2
@@ -49,14 +49,14 @@ Installation is quite trivial:
 
 .. code-block:: shell
 
-    $ pip install sshrc
+    $ pip install concierge
 
 or if you want to install it manually, do following:
 
 .. code-block:: shell
 
-    $ git clone https://github.com/9seconds/sshrc.git
-    $ cd sshrc
+    $ git clone https://github.com/9seconds/concierge.git
+    $ cd concierge
     $ python setup.py install
 
 By default, no template support will be installed. If you want to use
@@ -64,13 +64,13 @@ Mako_ or Jinja2_, please do following:
 
 .. code-block:: shell
 
-    $ pip install sshrc[mako]
+    $ pip install concierge[mako]
 
 or
 
 .. code-block:: shell
 
-    $ pip install sshrc[jinja]
+    $ pip install concierge[jinja]
 
 
 If you already have them installed, then you are good.
@@ -84,64 +84,66 @@ example), please update your pip and setuptools first.
 
 Eventually there will be no such problem anywhere.
 
-Please be noticed, that ``sshrc`` is **Python 3** only tool. It should
-work on ``cPython >= 3.3`` without any problems. Come on, Python 3.4 is
-bundled even with CentOS 7!
+Please be noticed, that ``concierge`` is **Python 3** only tool. It
+should work on ``cPython >= 3.3`` without any problems. Come on, Python
+3.4 is bundled even with CentOS 7!
 
 After installation, 2 utilities will be available:
 
-* ``sshrc-check``
-* ``sshrcd``
+* ``concierge-check``
+* ``concierge``
 
 
-sshrc-check
------------
+concierge-check
+---------------
 
-``sshrc-check`` is a tool to verify syntax of your ``~/.sshrc`` file. Please
-check `Syntax description`_ to get on speed.
+``concierge-check`` is a tool to verify syntax of your
+``~/.conciergerc`` file. Please check `Syntax description`_ to get on
+speed.
 
 Also, it supports a number of options but they are pretty trivial.
 
-Please remember, that both ``sshrc-check`` and ``sshrcd`` use syslog for
-logging data in process. Options like ``--debug`` or ``--verbose`` will
-affect only stderr logging, syslog will have only errors.
+Please remember, that both ``concierge-check`` and ``concierge``
+use syslog for logging data in process. Options like ``--debug`` or
+``--verbose`` will affect only stderr logging, syslog will have only
+errors.
 
 
-sshrcd
-------
+concierge
+---------
 
-``sshrcd`` is intended to work in daemon mode. It converts between your
-``~/.sshrc`` and destination ``~/.ssh/config`` (so `Installation`_ magic
-work in that way).
+``concierge`` is intended to work in daemon mode. It converts between
+your ``~/.conciergerc`` and destination ``~/.ssh/config`` (so
+`Installation`_ magic work in that way).
 
-I use systemd so ``sshrcd`` is bundled to support it. To get an instructions
-of how to use the tool with systemd, please run following:
+I use systemd so ``concierge`` is bundled to support it. To get an
+instructions of how to use the tool with systemd, please run following:
 
 .. code-block:: shell
 
-    $ sshrcd --systemd
+    $ concierge --systemd
 
 It will printout an instructions. If you do not care, please run following:
 
 .. code-block:: shell
 
-    $ eval $(sshrcd --systemd --curlsh)
+    $ eval $(concierge --systemd --curlsh)
 
-It will install systemd user unit and run sshrcd daemon automatically.
+It will install systemd user unit and run concierge daemon automatically.
 
-``sshrcd`` supports the same options and behavior as `sshrc-check`_ so please
-track your syslog for problems.
+``concierge`` supports the same options and behavior as
+`concierge-check`_ so please track your syslog for problems.
 
 
 Syntax description
 ==================
 
 Well, there is no big difference between plain old ``ssh_config(5)`` and
-``sshrc`` style. Base is the same so please check the table with examples
-to understand what is going to be converted and how.
+``concierge`` style. Base is the same so please check the table with
+examples to understand what is going to be converted and how.
 
-Syntax came from the way I structure my SSH configs for a long time.
-Basically I am trying to keep it in the way it looks like hierarchical.
+Syntax came from the way I structure my SSH configs for a long time    .
+Basically I am trying to keep it in the way it looks like hierarchical .
 
 Let's grow the syntax. Consider following config
 
@@ -190,18 +192,18 @@ So far so good. Now let's... indent!
         CompressionLevel 9
 
 
-It is still valid SSH config. And valid ``sshrc`` config. Probably you
-already do similar indentation to visually differ different server
+It is still valid SSH config. And valid ``concierge`` config. Probably
+you already do similar indentation to visually differ different server
 groups. Let's check what do we have here: we have prefixes, right. And
 most of options are quite common to the server groups (environments).
 
 Now let's eliminate ``Host m me0 me1`` block. This would be invalid SSH
-config but valid ``sshrc`` config. Also I am going to get rid of useless
-prefixes and use hierarchy to determine full name (``fullname = name +
-parent_name``).
+config but valid ``conciergerc`` config. Also I am going to get rid of
+useless prefixes and use hierarchy to determine full name (``fullname =
+name + parent_name``).
 
 Please be noticed that all operations maintain effectively the same
-``sshrc`` config.
+``conciergerc`` config.
 
 ::
 
@@ -269,8 +271,8 @@ equivalent.
     CompressionLevel 9
 
 
-This is a basic. But if you install ``sshrc`` with support of Mako or
-Jinja2 templates, you may use them in your ``~/.sshrc``.
+This is a basic. But if you install ``concierge`` with support of Mako or
+Jinja2 templates, you may use them in your ``~/.conciergerc``.
 
 ::
 
@@ -302,92 +304,92 @@ Examples
 Here are some examples. Please do not hesitate to check `Demo`_, pause it,
 look around.
 
-+------------------------------------+--------------------------------------------+
-| Source, converted from (~/.sshrc)  | Destination, converted to (~/.ssh/config)  |
-+====================================+============================================+
-| ::                                 | ::                                         |
-|                                    |                                            |
-|   Host name                        |   Host name                                |
-|       HostName 127.0.0.1           |       HostName 127.0.0.1                   |
-|                                    |                                            |
-+------------------------------------+--------------------------------------------+
-| ::                                 | ::                                         |
-|                                    |                                            |
-|   Compression yes                  |   Host name                                |
-|                                    |       HostName 127.0.0.1                   |
-|   Host name                        |                                            |
-|       HostName 127.0.0.1           |   Host *                                   |
-|                                    |       Compression yes                      |
-|                                    |                                            |
-+------------------------------------+--------------------------------------------+
-| ::                                 | ::                                         |
-|                                    |                                            |
-|   Compression yes                  |   Host name                                |
-|                                    |       HostName 127.0.0.1                   |
-|   Host name                        |                                            |
-|       HostName 127.0.0.1           |   Host *                                   |
-|                                    |       Compression yes                      |
-|   Host *                           |       CompressionLevel 9                   |
-|       CompressionLevel 9           |                                            |
-|                                    |                                            |
-+------------------------------------+--------------------------------------------+
-| ::                                 | ::                                         |
-|                                    |                                            |
-|   Compression yes                  |   Host name                                |
-|                                    |       HostName 127.0.0.1                   |
-|   Host name                        |                                            |
-|       HostName 127.0.0.1           |   Host nameq                               |
-|                                    |       HostName node-1                      |
-|       Host q                       |       ProxyCommand ssh -W %h:%p env1       |
-|           ViaJumpHost env1         |                                            |
-|           HostName node-1          |   Host *                                   |
-|                                    |       Compression yes                      |
-|                                    |                                            |
-+------------------------------------+--------------------------------------------+
-| ::                                 | ::                                         |
-|                                    |                                            |
-|   Compression yes                  |   Host nameq                               |
-|                                    |       HostName node-1                      |
-|   -Host name                       |       ProxyCommand ssh -W %h:%p env1       |
-|       HostName 127.0.0.1           |                                            |
-|                                    |   Host *                                   |
-|       Host q                       |       Compression yes                      |
-|           ViaJumpHost env1         |                                            |
-|           HostName node-1          |                                            |
-|                                    |                                            |
-+------------------------------------+--------------------------------------------+
-| ::                                 | ::                                         |
-|                                    |                                            |
-|   Compression yes                  |   Host blog                                |
-|                                    |       User sa                              |
-|   Host m                           |                                            |
-|       User nineseconds             |   Host me0                                 |
-|                                    |       HostName 10.10.0.0                   |
-|       % for i in range(2):         |       Protocol 2                           |
-|       Host e${i}                   |       ProxyCommand ssh -W %h:%p gw2        |
-|           HostName 10.10.0.${i}    |       User nineseconds                     |
-|           ViaJumpHost gw2          |                                            |
-|       % endfor                     |   Host me1                                 |
-|                                    |       HostName 10.10.0.1                   |
-|       Protocol 2                   |       Protocol 2                           |
-|                                    |       ProxyCommand ssh -W %h:%p gw2        |
-|   Host blog                        |       User nineseconds                     |
-|       User sa                      |                                            |
-|                                    |   Host *                                   |
-|                                    |       Compression yes                      |
-|                                    |                                            |
-+------------------------------------+--------------------------------------------+
++----------------------------------------+--------------------------------------------+
+| Source, converted from (~/.concierge)  | Destination, converted to (~/.ssh/config)  |
++========================================+============================================+
+| ::                                     | ::                                         |
+|                                        |                                            |
+|   Host name                            |   Host name                                |
+|       HostName 127.0.0.1               |       HostName 127.0.0.1                   |
+|                                        |                                            |
++----------------------------------------+--------------------------------------------+
+| ::                                     | ::                                         |
+|                                        |                                            |
+|   Compression yes                      |   Host name                                |
+|                                        |       HostName 127.0.0.1                   |
+|   Host name                            |                                            |
+|       HostName 127.0.0.1               |   Host *                                   |
+|                                        |       Compression yes                      |
+|                                        |                                            |
++----------------------------------------+--------------------------------------------+
+| ::                                     | ::                                         |
+|                                        |                                            |
+|   Compression yes                      |   Host name                                |
+|                                        |       HostName 127.0.0.1                   |
+|   Host name                            |                                            |
+|       HostName 127.0.0.1               |   Host *                                   |
+|                                        |       Compression yes                      |
+|   Host *                               |       CompressionLevel 9                   |
+|       CompressionLevel 9               |                                            |
+|                                        |                                            |
++----------------------------------------+--------------------------------------------+
+| ::                                     | ::                                         |
+|                                        |                                            |
+|   Compression yes                      |   Host name                                |
+|                                        |       HostName 127.0.0.1                   |
+|   Host name                            |                                            |
+|       HostName 127.0.0.1               |   Host nameq                               |
+|                                        |       HostName node-1                      |
+|       Host q                           |       ProxyCommand ssh -W %h:%p env1       |
+|           ViaJumpHost env1             |                                            |
+|           HostName node-1              |   Host *                                   |
+|                                        |       Compression yes                      |
+|                                        |                                            |
++----------------------------------------+--------------------------------------------+
+| ::                                     | ::                                         |
+|                                        |                                            |
+|   Compression yes                      |   Host nameq                               |
+|                                        |       HostName node-1                      |
+|   -Host name                           |       ProxyCommand ssh -W %h:%p env1       |
+|       HostName 127.0.0.1               |                                            |
+|                                        |   Host *                                   |
+|       Host q                           |       Compression yes                      |
+|           ViaJumpHost env1             |                                            |
+|           HostName node-1              |                                            |
+|                                        |                                            |
++----------------------------------------+--------------------------------------------+
+| ::                                     | ::                                         |
+|                                        |                                            |
+|   Compression yes                      |   Host blog                                |
+|                                        |       User sa                              |
+|   Host m                               |                                            |
+|       User nineseconds                 |   Host me0                                 |
+|                                        |       HostName 10.10.0.0                   |
+|       % for i in range(2):             |       Protocol 2                           |
+|       Host e${i}                       |       ProxyCommand ssh -W %h:%p gw2        |
+|           HostName 10.10.0.${i}        |       User nineseconds                     |
+|           ViaJumpHost gw2              |                                            |
+|       % endfor                         |   Host me1                                 |
+|                                        |       HostName 10.10.0.1                   |
+|       Protocol 2                       |       Protocol 2                           |
+|                                        |       ProxyCommand ssh -W %h:%p gw2        |
+|   Host blog                            |       User nineseconds                     |
+|       User sa                          |                                            |
+|                                        |   Host *                                   |
+|                                        |       Compression yes                      |
+|                                        |                                            |
++----------------------------------------+--------------------------------------------+
 
 
 .. _SASS: http://sass-lang.com
 .. _Mako: http://www.makotemplates.org
 .. _Jinja2: http://jinja.pocoo.org
 
-.. |PyPI| image:: https://img.shields.io/pypi/v/sshrc.svg
-    :target: https://github.com/9seconds/sshrc
+.. |PyPI| image:: https://img.shields.io/pypi/v/concierge.svg
+    :target: https://github.com/9seconds/concierge
 
-.. |Build Status| image:: https://travis-ci.org/9seconds/sshrc.svg?branch=master
-    :target: https://travis-ci.org/9seconds/sshrc
+.. |Build Status| image:: https://travis-ci.org/9seconds/concierge.svg?branch=master
+    :target: https://travis-ci.org/9seconds/concierge
 
-.. |Code Coverage| image:: https://codecov.io/github/9seconds/sshrc/coverage.svg?branch=master
-    :target: https://codecov.io/github/9seconds/sshrc?branch=master
+.. |Code Coverage| image:: https://codecov.io/github/9seconds/concierge/coverage.svg?branch=master
+    :target: https://codecov.io/github/9seconds/concierge?branch=master
