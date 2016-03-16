@@ -57,29 +57,32 @@ class Daemon(concierge.endpoints.common.App):
 
     def track(self):
         with inotify_simple.INotify() as notify:
-            while True:
-                try:
-                    notify.add_watch(self.source_path, self.INOTIFY_FLAGS)
-                except IOError as exc:
-                    if exc.errno != errno.ENOENT:
-                        raise
+            self.add_watch(notify)
+            self.manage_events(notify)
 
+    def add_watch(self, notify):
+        while True:
+            try:
+                notify.add_watch(self.source_path, self.INOTIFY_FLAGS)
+            except IOError as exc:
+                if exc.errno == errno.ENOENT:
                     LOG.info("Config file is not created yet. Wait.")
                     time.sleep(1)
-                else:
-                    break
+                    continue
+                raise
+            else:
+                break
 
-            while True:
-                try:
-                    events = notify.read()
-                except KeyboardInterrupt:
-                    return os.EX_OK
+    def manage_events(self, notify):
+        while True:
+            try:
+                events = notify.read()
+            except KeyboardInterrupt:
+                return os.EX_OK
 
-                LOG.debug("Got %d events. First is %s", len(events), events[0])
-
-                self.output()
-
-                LOG.info("Config was managed. Going to the next loop.")
+            LOG.debug("Got %d events. First is %s", len(events), events[0])
+            self.output()
+            LOG.info("Config was managed. Going to the next loop.")
 
 
 main = concierge.endpoints.common.main(Daemon)

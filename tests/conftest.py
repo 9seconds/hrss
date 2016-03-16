@@ -36,6 +36,11 @@ def have_mocked(request, *mock_args, **mock_kwargs):
 
 
 @pytest.fixture
+def no_sleep(monkeypatch):
+    monkeypatch.setattr("time.sleep", lambda arg: arg)
+
+
+@pytest.fixture
 def mock_get_content(request):
     return have_mocked(request, "concierge.utils.get_content")
 

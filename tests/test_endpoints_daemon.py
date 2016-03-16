@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 
+import errno
 import os
 
 import inotify_simple
@@ -72,6 +73,46 @@ def test_work(mock_mainfunc, ptmpdir, main_method):
 
     with concierge.utils.topen(ptmpdir.join("filename").strpath) as filefp:
         assert 1 == sum(int(line.strip() == "Host *") for line in filefp)
+
+
+def test_track_no_file_yet(no_sleep, mock_mainfunc, ptmpdir):
+    _, _, _, inotifier = mock_mainfunc
+
+    def add_watch(*args, **kwargs):
+        if add_watch.timer:
+            add_watch.timer -= 1
+
+            exc = IOError("Hello?")
+            exc.errno = errno.ENOENT
+
+            raise exc
+
+    add_watch.timer = 5
+    inotifier.add_watch.side_effect = add_watch
+
+    app = get_app()
+    app.destination_path = ptmpdir.join("filename").strpath
+    app.track()
+
+    assert not add_watch.timer
+
+
+def test_track_cannot_read(no_sleep, mock_mainfunc, ptmpdir):
+    _, _, _, inotifier = mock_mainfunc
+
+    def add_watch(*args, **kwargs):
+        exc = IOError("Hello?")
+        exc.errno = errno.EPERM
+
+        raise exc
+
+    inotifier.add_watch.side_effect = add_watch
+
+    app = get_app()
+    app.destination_path = ptmpdir.join("filename").strpath
+
+    with pytest.raises(IOError):
+        app.track()
 
 
 def test_mainfunc_ok(mock_mainfunc):
