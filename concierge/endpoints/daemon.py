@@ -3,8 +3,10 @@
 """`concierge` daemon which converts ~/.conciergerc to ~/.ssh/config."""
 
 
+import errno
 import os
 import sys
+import time
 
 import inotify_simple
 
@@ -16,6 +18,8 @@ LOG = concierge.utils.logger(__name__)
 
 
 class Daemon(concierge.endpoints.common.App):
+
+    INOTIFY_FLAGS = inotify_simple.flags.CREATE | inotify_simple.flags.MODIFY
 
     @classmethod
     def specify_parser(cls, parser):
@@ -53,9 +57,17 @@ class Daemon(concierge.endpoints.common.App):
 
     def track(self):
         with inotify_simple.INotify() as notify:
-            notify.add_watch(
-                self.source_path,
-                inotify_simple.flags.MODIFY | inotify_simple.flags.CREATE)
+            while True:
+                try:
+                    notify.add_watch(self.source_path, self.INOTIFY_FLAGS)
+                except IOError as exc:
+                    if exc.errno != errno.ENOENT:
+                        raise
+
+                    LOG.info("Config file is not created yet. Wait.")
+                    time.sleep(1)
+                else:
+                    break
 
             while True:
                 try:

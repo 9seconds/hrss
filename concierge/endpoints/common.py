@@ -123,14 +123,16 @@ def main(app_class):
         parser = concierge.endpoints.cli.create_parser()
         parser = app_class.specify_parser(parser)
         options = parser.parse_args()
+        app = app_class(options)
 
         LOG.debug("Options: %s", options)
 
-        app = app_class(options)
-
         try:
             return app.do()
-        except Exception:
+        except KeyboardInterrupt:
+            pass
+        except Exception as exc:
+            LOG.exception("Failed with error %s", exc)
             return os.EX_SOFTWARE
 
     return main_func
