@@ -3,7 +3,7 @@
 
 import pytest
 
-import sshrc.core.parser as parser
+import concierge.core.parser as parser
 
 
 @pytest.mark.parametrize(

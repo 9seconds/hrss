@@ -3,9 +3,9 @@
 
 import pytest
 
-import sshrc.core.exceptions as exceptions
-import sshrc.core.lexer as lexer
-import sshrc.core.parser as parser
+import concierge.core.exceptions as exceptions
+import concierge.core.lexer as lexer
+import concierge.core.parser as parser
 
 
 def is_trackable_host():

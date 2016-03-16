@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
 
-import sshrc.core.lexer as lexer
-import sshrc.core.parser as parser
-import sshrc.core.processor as process
+import concierge.core.lexer as lexer
+import concierge.core.parser as parser
+import concierge.core.processor as process
 
 
 CONTENT = """\

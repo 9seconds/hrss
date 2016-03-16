@@ -5,9 +5,9 @@ import os
 
 import pytest
 
-import sshrc
-import sshrc.endpoints.cli as cli
-import sshrc.endpoints.common as common
+import concierge
+import concierge.endpoints.cli as cli
+import concierge.endpoints.common as common
 
 
 def get_app():
@@ -191,7 +191,7 @@ def test_output_file_exception(monkeypatch, cliargs_default, ptmpdir,
     def write_fail(*args, **kwargs):
         raise Exception
 
-    monkeypatch.setattr("sshrc.utils.topen", write_fail)
+    monkeypatch.setattr("concierge.utils.topen", write_fail)
     mock_get_content.return_value = """\
 Compression yes
 
@@ -223,7 +223,7 @@ def test_create_app(cliargs_fullset, templater, mock_log_configuration):
     if options["source_path"]:
         assert app.source_path == "/path/to"
     else:
-        assert app.source_path == sshrc.DEFAULT_SSHRC
+        assert app.source_path == concierge.DEFAULT_RC
 
     if options["destination_path"]:
         assert app.destination_path == "/path/to"
@@ -254,7 +254,7 @@ Host q
         HostName lalala
     """
 
-    main = sshrc.endpoints.common.main(SimpleApp)
+    main = concierge.endpoints.common.main(SimpleApp)
     result = main()
 
     assert result is None or result == os.EX_OK
@@ -263,6 +263,6 @@ Host q
 def test_mainfunc_exception(cliargs_default, templater, mock_get_content):
     mock_get_content.side_effect = Exception
 
-    main = sshrc.endpoints.common.main(SimpleApp)
+    main = concierge.endpoints.common.main(SimpleApp)
 
     assert main() != os.EX_OK

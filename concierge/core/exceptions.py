@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 
 
-import sshrc.core
+import concierge.core
 
 
-class SSHRCError(Exception):
+class ConciergeError(Exception):
     pass
 
 
-class ReaderError(SSHRCError):
+class ReaderError(ConciergeError):
     pass
 
 
@@ -31,8 +31,10 @@ class LexerIncorrectIndentationLength(LexerError):
 
     def __init__(self, line, lineno, indentation_value):
         super().__init__(
-            self.MESSAGE.format(lineno, line,
-                                indentation_value, sshrc.core.INDENT_LENGTH))
+            self.MESSAGE.format(
+                lineno, line,
+                indentation_value,
+                concierge.core.INDENT_LENGTH))
 
 
 class LexerIncorrectFirstIndentationError(LexerError):

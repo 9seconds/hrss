@@ -3,7 +3,7 @@
 
 import pytest
 
-import sshrc.endpoints.templates as templates
+import concierge.endpoints.templates as templates
 
 
 @pytest.mark.parametrize(
@@ -16,7 +16,7 @@ def test_make_header(filename, date):
     kwargs = {}
 
     if filename is not None:
-        kwargs["sshrc_file"] = filename
+        kwargs["rc_file"] = filename
     if date is not None:
         kwargs["date"] = date
 

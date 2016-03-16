@@ -6,7 +6,7 @@ import shutil
 import sys
 import unittest.mock
 
-import sshrc
+import concierge
 
 import pytest
 
@@ -37,12 +37,12 @@ def have_mocked(request, *mock_args, **mock_kwargs):
 
 @pytest.fixture
 def mock_get_content(request):
-    return have_mocked(request, "sshrc.utils.get_content")
+    return have_mocked(request, "concierge.utils.get_content")
 
 
 @pytest.fixture(scope="session", autouse=True)
 def mock_logger(request):
-    return have_mocked(request, "sshrc.utils.logger")
+    return have_mocked(request, "concierge.utils.logger")
 
 
 @pytest.fixture(autouse=True)
@@ -52,7 +52,7 @@ def mock_log_configuration(request):
     marker = request.node.get_marker("no_mock_log_configuration")
 
     if not marker:
-        return have_mocked(request, "sshrc.utils.configure_logging")
+        return have_mocked(request, "concierge.utils.configure_logging")
 
 
 @pytest.fixture
@@ -67,7 +67,7 @@ def ptmpdir(request, tmpdir):
 
 @pytest.fixture
 def sysargv(monkeypatch):
-    argv = ["sshrcd"]
+    argv = ["concierge"]
 
     monkeypatch.setattr(sys, "argv", argv)
 
@@ -78,7 +78,7 @@ def sysargv(monkeypatch):
 def templater(request, monkeypatch):
     templater = FakeTemplater(request.param)
 
-    monkeypatch.setitem(sshrc.EXTRAS, "templater", templater)
+    monkeypatch.setitem(concierge.EXTRAS, "templater", templater)
 
     return templater
 
@@ -187,7 +187,8 @@ def cliargs_fullset(sysargv, templater, cliparam_debug, cliparam_verbose,
 
 
 @pytest.fixture
-def cliargs_sshrcd_fullset(cliargs_fullset, cliparam_systemd, cliparam_curlsh):
+def cliargs_concierge_fullset(cliargs_fullset, cliparam_systemd,
+                              cliparam_curlsh):
     sysargv, options = cliargs_fullset
 
     for param in cliparam_systemd, cliparam_curlsh:

@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 
 
-import sshrc.core.lexer
-import sshrc.core.parser
+import concierge.core.lexer
+import concierge.core.parser
 
 
 def process(content):
     content = content.split("\n")
-    content = sshrc.core.lexer.lex(content)
-    content = sshrc.core.parser.parse(content)
+    content = concierge.core.lexer.lex(content)
+    content = concierge.core.parser.parse(content)
     content = generate(content)
     content = "\n".join(content)
 
@@ -18,8 +18,10 @@ def process(content):
 def generate(tree):
     for host in flat(tree):
         yield "Host {}".format(host.fullname)
+
         for option, value in sorted(host.options.items()):
             yield "    {} {}".format(option, value)
+
         yield ""
 
 

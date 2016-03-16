@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
 
-import sshrc.core.exceptions as exceptions
-import sshrc.core.lexer as lexer
+import concierge.core.exceptions as exceptions
+import concierge.core.lexer as lexer
 
 import pytest
 

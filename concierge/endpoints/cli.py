@@ -3,7 +3,7 @@
 
 import argparse
 
-import sshrc
+import concierge
 
 
 def create_parser():
@@ -20,8 +20,8 @@ def create_parser():
         default=False)
     parser.add_argument(
         "-s", "--source-path",
-        help="Path of sshrc. Default is {}".format(sshrc.DEFAULT_SSHRC),
-        default=sshrc.DEFAULT_SSHRC)
+        help="Path of concierge. Default is {}".format(concierge.DEFAULT_RC),
+        default=concierge.DEFAULT_RC)
     parser.add_argument(
         "-o", "--destination-path",
         help=("Path of ssh config. If nothing is set, then prints to stdout. "
@@ -41,11 +41,11 @@ def create_parser():
         action="store_true",
         default=None)
 
-    if sshrc.EXTRAS["templater"].name:
+    if concierge.EXTRAS["templater"].name:
         parser.add_argument(
             "-t", "--no-templater",
             help="Do not use {} templater for SOURCE_PATH.".format(
-                sshrc.EXTRAS["templater"].name),
+                concierge.EXTRAS["templater"].name),
             action="store_true",
             default=False)
 

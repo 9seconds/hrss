@@ -3,7 +3,7 @@
 
 import pytest
 
-import sshrc.utils as utils
+import concierge.utils as utils
 
 
 def test_topen_write_read(ptmpdir):

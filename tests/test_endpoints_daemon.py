@@ -6,10 +6,10 @@ import os
 import inotify_simple
 import pytest
 
-import sshrc
-import sshrc.endpoints.cli as cli
-import sshrc.endpoints.sshrcd as sshrcd
-import sshrc.utils
+import concierge
+import concierge.endpoints.cli as cli
+import concierge.endpoints.daemon as daemon
+import concierge.utils
 
 
 FLAGS = inotify_simple.flags.MODIFY | inotify_simple.flags.CREATE
@@ -17,14 +17,14 @@ FLAGS = inotify_simple.flags.MODIFY | inotify_simple.flags.CREATE
 
 def get_app(*params):
     parser = cli.create_parser()
-    parser = sshrcd.Daemon.specify_parser(parser)
+    parser = daemon.Daemon.specify_parser(parser)
     parsed = parser.parse_args()
 
     for param in params:
         if param:
             setattr(parsed, param.strip("-"), True)
 
-    app = sshrcd.Daemon(parsed)
+    app = daemon.Daemon(parsed)
 
     return app
 
@@ -67,15 +67,15 @@ def test_work(mock_mainfunc, ptmpdir, main_method):
     else:
         app.track()
 
-    inotifier.add_watch.assert_called_once_with(sshrc.DEFAULT_SSHRC, FLAGS)
+    inotifier.add_watch.assert_called_once_with(concierge.DEFAULT_RC, FLAGS)
     assert not inotifier.v
 
-    with sshrc.utils.topen(ptmpdir.join("filename").strpath) as filefp:
+    with concierge.utils.topen(ptmpdir.join("filename").strpath) as filefp:
         assert 1 == sum(int(line.strip() == "Host *") for line in filefp)
 
 
 def test_mainfunc_ok(mock_mainfunc):
-    result = sshrcd.main()
+    result = daemon.main()
 
     assert result is None or result == os.EX_OK
 
@@ -84,6 +84,6 @@ def test_mainfunc_exception(mock_mainfunc):
     _, _, _, inotifier = mock_mainfunc
     inotifier.read.side_effect = Exception
 
-    result = sshrcd.main()
+    result = daemon.main()
 
     assert result != os.EX_OK

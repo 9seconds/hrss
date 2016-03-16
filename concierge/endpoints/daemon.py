@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""`sshrcd` daemon which converts ~/.sshrc to ~/.ssh/config."""
+"""`concierge` daemon which converts ~/.conciergerc to ~/.ssh/config."""
 
 
 import os
@@ -8,14 +8,14 @@ import sys
 
 import inotify_simple
 
-import sshrc.endpoints.common
-import sshrc.utils
+import concierge.endpoints.common
+import concierge.utils
 
 
-LOG = sshrc.utils.logger(__name__)
+LOG = concierge.utils.logger(__name__)
 
 
-class Daemon(sshrc.endpoints.common.App):
+class Daemon(concierge.endpoints.common.App):
 
     @classmethod
     def specify_parser(cls, parser):
@@ -42,7 +42,7 @@ class Daemon(sshrc.endpoints.common.App):
         if not self.systemd:
             return self.track()
 
-        script = sshrc.endpoints.templates.make_systemd_script()
+        script = concierge.endpoints.templates.make_systemd_script()
 
         if not self.curlsh:
             script = [
@@ -70,7 +70,7 @@ class Daemon(sshrc.endpoints.common.App):
                 LOG.info("Config was managed. Going to the next loop.")
 
 
-main = sshrc.endpoints.common.main(Daemon)
+main = concierge.endpoints.common.main(Daemon)
 
 
 if __name__ == "__main__":

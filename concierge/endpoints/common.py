@@ -4,13 +4,13 @@
 import abc
 import os
 
-import sshrc.core.processor
-import sshrc.endpoints.cli
-import sshrc.endpoints.templates
-import sshrc.utils
+import concierge.core.processor
+import concierge.endpoints.cli
+import concierge.endpoints.templates
+import concierge.utils
 
 
-LOG = sshrc.utils.logger(__name__)
+LOG = concierge.utils.logger(__name__)
 
 
 class App(metaclass=abc.ABCMeta):
@@ -29,7 +29,7 @@ class App(metaclass=abc.ABCMeta):
         if self.add_header is None:
             self.add_header = options.destination_path is not None
 
-        sshrc.utils.configure_logging(
+        concierge.utils.configure_logging(
             options.debug,
             options.verbose,
             self.destination_path is None)
@@ -46,7 +46,7 @@ class App(metaclass=abc.ABCMeta):
             return
 
         try:
-            with sshrc.utils.topen(self.destination_path, True) as destfp:
+            with concierge.utils.topen(self.destination_path, True) as destfp:
                 destfp.write(content)
         except Exception as exc:
             LOG.error("Cannot write to file %s: %s",
@@ -77,7 +77,7 @@ class App(metaclass=abc.ABCMeta):
         LOG.info("Fetching content from %s", self.source_path)
 
         try:
-            content = sshrc.utils.get_content(self.source_path)
+            content = concierge.utils.get_content(self.source_path)
         except Exception as exc:
             LOG.error("Cannot fetch content from %s: %s",
                       self.source_path, exc)
@@ -91,10 +91,11 @@ class App(metaclass=abc.ABCMeta):
         LOG.info("Applying templater to content of %s.", self.source_path)
 
         try:
-            content = sshrc.EXTRAS["templater"].render(content)
+            content = concierge.EXTRAS["templater"].render(content)
         except Exception as exc:
             LOG.error("Cannot process template (%s) in source file %s.",
-                      self.source_path, sshrc.EXTRAS["templater"].name, exc)
+                      self.source_path, concierge.EXTRAS["templater"].name,
+                      exc)
             raise
 
         LOG.info("Templated content of %s:\n%s", self.source_path, content)
@@ -103,15 +104,15 @@ class App(metaclass=abc.ABCMeta):
 
     def process_syntax(self, content):
         try:
-            return sshrc.core.processor.process(content)
+            return concierge.core.processor.process(content)
         except Exception as exc:
             LOG.error("Cannot parse content of source file %s: %s",
                       self.source_path, exc)
             raise
 
     def attach_header(self, content):
-        header = sshrc.endpoints.templates.make_header(
-            sshrc_file=self.source_path)
+        header = concierge.endpoints.templates.make_header(
+            rc_file=self.source_path)
         content = header + content
 
         return content
@@ -119,7 +120,7 @@ class App(metaclass=abc.ABCMeta):
 
 def main(app_class):
     def main_func():
-        parser = sshrc.endpoints.cli.create_parser()
+        parser = concierge.endpoints.cli.create_parser()
         parser = app_class.specify_parser(parser)
         options = parser.parse_args()
 

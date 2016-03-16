@@ -5,8 +5,8 @@ import collections
 import itertools
 import json
 
-import sshrc.core.exceptions as exceptions
-import sshrc.utils
+import concierge.core.exceptions as exceptions
+import concierge.utils
 
 
 VALID_OPTIONS = set((
@@ -83,7 +83,7 @@ VALID_OPTIONS = set((
 VIA_JUMP_HOST_OPTION = "ViaJumpHost"
 VALID_OPTIONS.add(VIA_JUMP_HOST_OPTION)
 
-LOG = sshrc.utils.logger(__name__)
+LOG = concierge.utils.logger(__name__)
 
 
 class Host(object):

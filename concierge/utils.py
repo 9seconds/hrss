@@ -8,7 +8,7 @@ import logging.handlers
 import sys
 
 
-LOG_NAMESPACE = "sshrc"
+LOG_NAMESPACE = "concierge"
 
 
 def get_syslog_address():
