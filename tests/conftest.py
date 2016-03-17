@@ -2,12 +2,13 @@
 
 
 import os
+import os.path
 import shutil
 import sys
 import unittest.mock
 
 import concierge
-
+import inotify_simple
 import pytest
 
 
@@ -94,7 +95,9 @@ def inotifier(request):
     mock.return_value = mock
     mock.__enter__.return_value = mock
 
-    values = [True] * 3
+    values = [inotify_simple.Event(0, 0, 0,
+                                   os.path.basename(concierge.DEFAULT_RC))]
+    values *= 3
 
     def side_effect():
         if values:

@@ -3,10 +3,9 @@
 """`concierge` daemon which converts ~/.conciergerc to ~/.ssh/config."""
 
 
-import errno
 import os
+import os.path
 import sys
-import time
 
 import inotify_simple
 
@@ -17,9 +16,29 @@ import concierge.utils
 LOG = concierge.utils.logger(__name__)
 
 
+INOTIFY_FLAGS = (
+    inotify_simple.flags.CREATE |
+    inotify_simple.flags.MODIFY |
+    inotify_simple.flags.MOVED_TO |
+    inotify_simple.flags.EXCL_UNLINK
+)
+
+
 class Daemon(concierge.endpoints.common.App):
 
-    INOTIFY_FLAGS = inotify_simple.flags.CREATE | inotify_simple.flags.MODIFY
+    @staticmethod
+    def describe_events(events):
+        descriptions = []
+
+        for event in events:
+            flags = inotify_simple.flags.from_mask(event.mask)
+            flags = (str(flag) for flag in flags)
+
+            descriptions.append(
+                "Ev<(name={0}, flags={1})>".format(
+                    event.name, ",".join(flags)))
+
+        return descriptions
 
     @classmethod
     def specify_parser(cls, parser):
@@ -61,28 +80,39 @@ class Daemon(concierge.endpoints.common.App):
             self.manage_events(notify)
 
     def add_watch(self, notify):
-        while True:
-            try:
-                notify.add_watch(self.source_path, self.INOTIFY_FLAGS)
-            except IOError as exc:
-                if exc.errno == errno.ENOENT:
-                    LOG.info("Config file is not created yet. Wait.")
-                    time.sleep(1)
-                    continue
-                raise
-            else:
-                break
+        # there is a sad story on editors: some of them actually modify
+        # files. But some write temporary files and rename. So it is
+        # required to track directory where file is placed.
+        path = os.path.abspath(self.source_path)
+        path = os.path.dirname(path)
+        notify.add_watch(path, INOTIFY_FLAGS)
 
     def manage_events(self, notify):
+        filename = os.path.basename(self.source_path)
+
         while True:
             try:
                 events = notify.read()
             except KeyboardInterrupt:
                 return os.EX_OK
+            else:
+                LOG.debug("Caught %d events", len(events))
 
-            LOG.debug("Got %d events. First is %s", len(events), events[0])
-            self.output()
+            events = self.filter_events(filename, events)
+            descriptions = self.describe_events(events)
+            LOG.debug("Got %d events after filtration: %s",
+                      len(descriptions), descriptions)
+
+            if events:
+                self.output()
+
             LOG.info("Config was managed. Going to the next loop.")
+
+    def filter_events(self, name, events):
+        events = filter(lambda ev: ev.name == name, events)
+        events = list(events)
+
+        return events
 
 
 main = concierge.endpoints.common.main(Daemon)

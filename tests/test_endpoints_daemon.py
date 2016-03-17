@@ -2,7 +2,9 @@
 
 
 import errno
+import itertools
 import os
+import os.path
 
 import inotify_simple
 import pytest
@@ -11,9 +13,6 @@ import concierge
 import concierge.endpoints.cli as cli
 import concierge.endpoints.daemon as daemon
 import concierge.utils
-
-
-FLAGS = inotify_simple.flags.MODIFY | inotify_simple.flags.CREATE
 
 
 def get_app(*params):
@@ -68,33 +67,25 @@ def test_work(mock_mainfunc, ptmpdir, main_method):
     else:
         app.track()
 
-    inotifier.add_watch.assert_called_once_with(concierge.DEFAULT_RC, FLAGS)
+    inotifier.add_watch.assert_called_once_with(
+        os.path.dirname(concierge.DEFAULT_RC), daemon.INOTIFY_FLAGS)
     assert not inotifier.v
 
     with concierge.utils.topen(ptmpdir.join("filename").strpath) as filefp:
         assert 1 == sum(int(line.strip() == "Host *") for line in filefp)
 
 
-def test_track_no_file_yet(no_sleep, mock_mainfunc, ptmpdir):
+def test_track_no_our_events(no_sleep, mock_mainfunc, ptmpdir):
     _, _, _, inotifier = mock_mainfunc
 
-    def add_watch(*args, **kwargs):
-        if add_watch.timer:
-            add_watch.timer -= 1
-
-            exc = IOError("Hello?")
-            exc.errno = errno.ENOENT
-
-            raise exc
-
-    add_watch.timer = 5
-    inotifier.add_watch.side_effect = add_watch
+    inotifier.v.clear()
+    inotifier.v.extend([inotify_simple.Event(0, 0, 0, "Fake")] * 3)
 
     app = get_app()
     app.destination_path = ptmpdir.join("filename").strpath
     app.track()
 
-    assert not add_watch.timer
+    assert not os.path.exists(ptmpdir.join("filename").strpath)
 
 
 def test_track_cannot_read(no_sleep, mock_mainfunc, ptmpdir):
@@ -113,6 +104,31 @@ def test_track_cannot_read(no_sleep, mock_mainfunc, ptmpdir):
 
     with pytest.raises(IOError):
         app.track()
+
+
+@pytest.mark.parametrize(
+    "ev1, ev2",
+    list(itertools.permutations(inotify_simple.flags, 2)))
+def test_event_names(ev1, ev2):
+    events = [
+        inotify_simple.Event(0, ev1, 0, "ev1"),
+        inotify_simple.Event(0, ev2, 0, "ev2"),
+        inotify_simple.Event(0, ev1 | ev2, 0, "ev1ev2")]
+
+    descriptions = daemon.Daemon.describe_events(events)
+
+    assert len(descriptions) == len(events)
+
+    assert "ev1" in descriptions[0]
+    assert str(ev1) in descriptions[0]
+
+    assert "ev2" in descriptions[1]
+    assert str(ev2) in descriptions[1]
+
+    assert "ev1" in descriptions[2]
+    assert "ev2" in descriptions[2]
+    assert str(ev1) in descriptions[2]
+    assert str(ev2) in descriptions[2]
 
 
 def test_mainfunc_ok(mock_mainfunc):
