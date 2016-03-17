@@ -39,7 +39,10 @@ management in SASS way.
 Demo
 ====
 
-Coming soon.
+.. image:: https://asciinema.org/a/dqxhschtqyx7lxfda25irbgh5.png
+    :alt: Asciinema screencast
+    :width: 700
+    :target: https://asciinema.org/a/dqxhschtqyx7lxfda25irbgh5
 
 
 Installation
@@ -127,7 +130,7 @@ It will printout an instructions. If you do not care, please run following:
 
 .. code-block:: shell
 
-    $ eval $(concierge --systemd --curlsh)
+    $ eval "$(concierge --systemd --curlsh)"
 
 It will install systemd user unit and run concierge daemon automatically.
 
@@ -386,7 +389,7 @@ look around.
 .. _Jinja2: http://jinja.pocoo.org
 
 .. |PyPI| image:: https://img.shields.io/pypi/v/concierge.svg
-    :target: https://github.com/9seconds/concierge
+    :target: https://pypi.python.org/pypi/concierge
 
 .. |Build Status| image:: https://travis-ci.org/9seconds/concierge.svg?branch=master
     :target: https://travis-ci.org/9seconds/concierge
