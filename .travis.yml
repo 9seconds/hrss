@@ -14,15 +14,14 @@ install:
   - pip install -r requirements.txt -r test-requirements.txt
   - pip install -U pip setuptools
   - python setup.py develop
-  # - pip install coveralls
 
 script:
   - py.test --cov-fail-under 90
   - flake8
-  - radon cc --average --show-closures sshrc
-  - radon raw --summary sshrc
-  - radon mi --show --multi sshrc
-  - xenon -mA -mA -bB sshrc
+  - radon cc --average --show-closures concierge
+  - radon raw --summary concierge
+  - radon mi --show --multi concierge
+  - xenon -aA -mA -bB concierge
 
 after_success:
   - codecov
