@@ -3,7 +3,7 @@ concierge
 
 |PyPI| |Build Status| |Code Coverage|
 
-``concierge`` is a small utility/deamon which is intended to help humans
+``concierge`` is a small utility/daemon which is intended to help humans
 to maintain their SSH configs.
 
 .. contents::
