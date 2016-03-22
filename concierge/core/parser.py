@@ -47,6 +47,7 @@ VALID_OPTIONS = set((
     "IdentityFile",
     "KbdInteractiveAuthentication",
     "KbdInteractiveDevices",
+    "KexAlgorithms",
     "LocalCommand",
     "LocalForward",
     "LogLevel",
