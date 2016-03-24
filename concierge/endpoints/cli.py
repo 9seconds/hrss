@@ -4,6 +4,7 @@
 import argparse
 
 import concierge
+import concierge.templater
 
 
 def create_parser():
@@ -40,13 +41,11 @@ def create_parser():
               "DESTINATION_PATH is stdout, then this option is set to false."),
         action="store_true",
         default=None)
-
-    if concierge.EXTRAS["templater"].name:
-        parser.add_argument(
-            "-t", "--no-templater",
-            help="Do not use {} templater for SOURCE_PATH.".format(
-                concierge.EXTRAS["templater"].name),
-            action="store_true",
-            default=False)
+    parser.add_argument(
+        "-t", "--templater",
+        help=("Use following templater for config file. If nothing is set, "
+              "then no templater will be used."),
+        choices=concierge.all_templaters().keys(),
+        default=None)
 
     return parser
