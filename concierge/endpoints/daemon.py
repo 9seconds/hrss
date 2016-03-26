@@ -65,7 +65,8 @@ class Daemon(concierge.endpoints.common.App):
         if not self.systemd:
             return self.track()
 
-        script = concierge.endpoints.templates.make_systemd_script()
+        script = concierge.endpoints.templates.make_systemd_script(
+            self.templater)
 
         if not self.curlsh:
             script = [
