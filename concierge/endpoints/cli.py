@@ -45,7 +45,8 @@ def create_parser():
         "-u", "--use-templater",
         help=("Use following templater for config file. If nothing is set, "
               "then default template resolve chain will be "
-              "used (Mako -> Jinja -> Nothing)"),
+              "used (Mako -> Jinja -> Nothing). Dummy templater means that "
+              "no templater is actually used."),
         choices=concierge.templater.all_templaters().keys(),
         default=None)
     parser.add_argument(

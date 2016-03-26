@@ -2,14 +2,15 @@
 
 
 import pkg_resources
+import warnings
 
 
 TEMPLATER_NAMESPACE = "concierge.templater"
-DEFAULT_RESOLVE_SEQ = "mako", "jinja2", None
+DEFAULT_RESOLVE_SEQ = "mako", "jinja2"
 
 
 def all_templaters():
-    templaters = dict.fromkeys(("dummy", None), Templater)
+    templaters = {"dummy": Templater}
 
     for plugin in pkg_resources.iter_entry_points(group=TEMPLATER_NAMESPACE):
         templaters[plugin.name] = plugin.load()
@@ -28,6 +29,8 @@ def resolve_templater(choose=None):
             if code in templaters:
                 found = templaters[code]
                 break
+        else:
+            found = Templater
 
     return found()
 

@@ -3,6 +3,7 @@
 
 import abc
 import os
+import warnings
 
 import concierge.core.processor
 import concierge.endpoints.cli
@@ -21,6 +22,19 @@ class App(metaclass=abc.ABCMeta):
         return parser
 
     def __init__(self, options):
+        if options.use_templater is None:
+            warnings.warn(
+                "--use-templater flag and therefore implicit templater "
+                "autoresolve are deprecated. Please use explicit "
+                "templater in both concierge-check and concierge.",
+                FutureWarning)
+
+        if options.no_templater:
+            warnings.warn(
+                "Flag --no-templater is deprecated. "
+                "Please use 'dummy' templater instead.",
+                DeprecationWarning)
+
         self.source_path = options.source_path
         self.destination_path = options.destination_path
         self.boring_syntax = options.boring_syntax

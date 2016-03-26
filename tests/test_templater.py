@@ -47,8 +47,7 @@ def mock_plugins(request, monkeypatch):
 def test_all_templaters(mock_plugins):
     tpls = templater.all_templaters()
 
-    assert len(tpls) == 4
-    assert tpls[None] is templater.Templater
+    assert len(tpls) == 3
     assert tpls["dummy"] is templater.Templater
     assert tpls["mako"]().render("q") == "mako q"
     assert tpls["jinja2"]().render("q") == "jinja2 q"
