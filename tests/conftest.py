@@ -8,18 +8,9 @@ import sys
 import unittest.mock
 
 import concierge
+import concierge.templater
 import inotify_simple
 import pytest
-
-
-class FakeTemplater(object):
-
-    @staticmethod
-    def render(content):
-        return content
-
-    def __init__(self, name):
-        self.name = name
 
 
 def have_mocked(request, *mock_args, **mock_kwargs):
@@ -80,15 +71,6 @@ def sysargv(monkeypatch):
     return argv
 
 
-@pytest.fixture(params=(None, "Fake"))
-def templater(request, monkeypatch):
-    templater = FakeTemplater(request.param)
-
-    monkeypatch.setitem(concierge.EXTRAS, "templater", templater)
-
-    return templater
-
-
 @pytest.fixture
 def inotifier(request):
     mock = have_mocked(request, "inotify_simple.INotify")
@@ -108,6 +90,11 @@ def inotifier(request):
     mock.v = values
 
     return mock
+
+
+@pytest.fixture
+def template_render(request):
+    return have_mocked(request, concierge.templater.Templater, "render")
 
 
 @pytest.fixture(params=(None, "-d", "--debug"))
@@ -161,7 +148,7 @@ def cliargs_default(sysargv):
 
 
 @pytest.fixture
-def cliargs_fullset(sysargv, templater, cliparam_debug, cliparam_verbose,
+def cliargs_fullset(sysargv, cliparam_debug, cliparam_verbose,
                     cliparam_source_path, cliparam_destination_path,
                     cliparam_boring_syntax, cliparam_add_header,
                     cliparam_no_templater):
@@ -188,7 +175,7 @@ def cliargs_fullset(sysargv, templater, cliparam_debug, cliparam_verbose,
             sysargv.append(param)
             sysargv.append("/path/to")
 
-    if templater.name and cliparam_no_templater:
+    if cliparam_no_templater:
         sysargv.append(cliparam_no_templater)
 
     return sysargv, options
@@ -210,7 +197,7 @@ def cliargs_concierge_fullset(cliargs_fullset, cliparam_systemd,
 
 
 @pytest.fixture
-def mock_mainfunc(cliargs_default, mock_get_content, templater, inotifier):
+def mock_mainfunc(cliargs_default, mock_get_content, inotifier):
     mock_get_content.return_value = """\
 Compression yes
 
@@ -221,4 +208,4 @@ Host q
         HostName lalala
     """
 
-    return cliargs_default, mock_get_content, templater, inotifier
+    return cliargs_default, mock_get_content, inotifier

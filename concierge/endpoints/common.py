@@ -26,8 +26,13 @@ class App(metaclass=abc.ABCMeta):
         self.boring_syntax = options.boring_syntax
         self.add_header = options.add_header
         self.no_templater = getattr(options, "no_templater", False)
-        self.templater = concierge.templater.resolve_templater(
-            options.use_templater)
+
+        try:
+            self.templater = concierge.templater.resolve_templater(
+                options.use_templater)
+        except KeyError:
+            raise ValueError(
+                "Cannot find templater for {0}".format(options.use_templater))
 
         if self.add_header is None:
             self.add_header = options.destination_path is not None

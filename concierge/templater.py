@@ -19,13 +19,17 @@ def all_templaters():
 
 def resolve_templater(choose=None):
     templaters = all_templaters()
+    found = None
 
     if choose:
-        return templaters[choose]
+        found = templaters[choose]
 
     for code in DEFAULT_RESOLVE_SEQ:
         if code in templaters:
-            return templaters[code]
+            found = templaters[code]
+
+    if found:
+        return found()
 
 
 class Templater:
