@@ -97,6 +97,28 @@ After installation, 2 utilities will be available:
 * ``concierge``
 
 
+Templaters
+----------
+
+``concierge`` comes with support of additional templaters, you may plug
+them in installing the packages from PyPI. At the time of writing,
+support of following templaters was done:
+
+* `concierge-mako <https://github.com/9seconds/concierge-mako>`_ -
+  support of Mako_ templates
+* `concierge-jinja <https://github.com/9seconds/concierge-jinja>`_ -
+  support of Jinja2_ templates
+
+To install them just do
+
+.. code-block:: shell
+
+    $ pip install concierge-mako
+
+And ``concierge`` will automatically recognizes support of Mako and now
+one may use ``concierge -u mako`` for her ``~/.conciergerc``.
+
+
 concierge-check
 ---------------
 
