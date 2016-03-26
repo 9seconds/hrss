@@ -4,6 +4,7 @@
 import pytest
 
 import concierge.endpoints.templates as templates
+import concierge.templater
 
 
 @pytest.mark.parametrize(
@@ -32,4 +33,4 @@ def test_make_header(filename, date):
 
 
 def test_make_systemd_script():
-    list(templates.make_systemd_script())  # have no idea how to test that
+    list(templates.make_systemd_script(concierge.templater.Templater))

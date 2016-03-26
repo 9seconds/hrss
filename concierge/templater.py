@@ -2,7 +2,6 @@
 
 
 import pkg_resources
-import warnings
 
 
 TEMPLATER_NAMESPACE = "concierge.templater"
@@ -35,7 +34,7 @@ def resolve_templater(choose=None):
     return found()
 
 
-class Templater:
+class Templater(object):
 
     name = "dummy"
     """The name of the templater to show."""

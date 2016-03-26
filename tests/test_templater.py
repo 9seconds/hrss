@@ -1,14 +1,12 @@
 # -*- coding: utf-8 -*-
 
 
-import collections
-
 import pytest
 
 import concierge.templater as templater
 
 
-class Plugin:
+class Plugin(object):
 
     def __init__(self, tpl):
         self.templater = tpl
@@ -54,7 +52,6 @@ def test_all_templaters(mock_plugins):
 
 
 def test_resolve_templater_none(mock_plugins):
-    tpls = templater.all_templaters()
     tpl = templater.resolve_templater("dummy")
 
     assert isinstance(tpl, templater.Templater)
