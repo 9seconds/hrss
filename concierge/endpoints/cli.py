@@ -42,10 +42,17 @@ def create_parser():
         action="store_true",
         default=None)
     parser.add_argument(
-        "-t", "--templater",
+        "-u", "--use-templater",
         help=("Use following templater for config file. If nothing is set, "
-              "then no templater will be used."),
-        choices=concierge.all_templaters().keys(),
+              "then default template resolve chain will be "
+              "used (Mako -> Jinja -> Nothing)"),
+        choices=concierge.templater.all_templaters().keys(),
         default=None)
+    parser.add_argument(
+        "-t", "--no-templater",
+        help=("Do not use any templater. Please be noticed that newer "
+              "version of concierge will change that behavior."),
+        action="store_true",
+        default=False)
 
     return parser

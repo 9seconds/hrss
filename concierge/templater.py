@@ -5,10 +5,11 @@ import pkg_resources
 
 
 TEMPLATER_NAMESPACE = "concierge.templater"
+DEFAULT_RESOLVE_SEQ = "mako", "jinja2", None
 
 
 def all_templaters():
-    templaters = {}
+    templaters = {Templater.code: Templater}
 
     for plugin in pkg_resources.iter_entry_points(group=TEMPLATER_NAMESPACE):
         templaters[plugin.name] = plugin.load()
@@ -16,12 +17,15 @@ def all_templaters():
     return templaters
 
 
-def get_templater(code):
-    if code is None:
-        return Templater()
+def resolve_templater(choose=None):
+    templaters = all_templaters()
 
-    return all_templaters()[code]
+    if choose:
+        return templaters[choose]
 
+    for code in DEFAULT_RESOLVE_SEQ:
+        if code in templaters:
+            return templaters[code]
 
 
 class Templater:

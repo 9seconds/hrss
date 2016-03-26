@@ -7,6 +7,7 @@ import os
 import concierge.core.processor
 import concierge.endpoints.cli
 import concierge.endpoints.templates
+import concierge.templater
 import concierge.utils
 
 
@@ -25,6 +26,8 @@ class App(metaclass=abc.ABCMeta):
         self.boring_syntax = options.boring_syntax
         self.add_header = options.add_header
         self.no_templater = getattr(options, "no_templater", False)
+        self.templater = concierge.templater.resolve_templater(
+            options.use_templater)
 
         if self.add_header is None:
             self.add_header = options.destination_path is not None
@@ -91,11 +94,10 @@ class App(metaclass=abc.ABCMeta):
         LOG.info("Applying templater to content of %s.", self.source_path)
 
         try:
-            content = concierge.EXTRAS["templater"].render(content)
+            content = self.templater.render(content)
         except Exception as exc:
             LOG.error("Cannot process template (%s) in source file %s.",
-                      self.source_path, concierge.EXTRAS["templater"].name,
-                      exc)
+                      self.source_path, self.templater.name, exc)
             raise
 
         LOG.info("Templated content of %s:\n%s", self.source_path, content)
