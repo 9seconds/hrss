@@ -77,60 +77,60 @@ Host *
     star_host = tree.hosts[0]
     assert star_host.trackable
     assert star_host.fullname == "*"
-    assert star_host.options == {"Compression": "yes",
-                                 "CompressionLevel": "6"}
+    assert star_host.options == {"Compression": ["yes"],
+                                 "CompressionLevel": ["6"]}
 
     m_host = tree.hosts[1]
     assert m_host.trackable
     assert m_host.fullname == "m"
-    assert m_host.options == {"Port": "22"}
+    assert m_host.options == {"Port": ["22"]}
     assert len(m_host.hosts) == 4
 
     me_host = m_host.hosts[0]
     assert me_host.trackable
     assert me_host.fullname == "me"
-    assert me_host.options == {"Port": "22", "HostName": "env10",
-                               "User": "root"}
+    assert me_host.options == {"Port": ["22"], "HostName": ["env10"],
+                               "User": ["root"]}
     assert len(me_host.hosts) == 1
 
     mewww_host = me_host.hosts[0]
     assert mewww_host.trackable
     assert mewww_host.fullname == "meWWW"
-    assert mewww_host.options == {"Port": "22", "TCPKeepAlive": "5",
-                                  "HostName": "env10", "User": "root"}
+    assert mewww_host.options == {"Port": ["22"], "TCPKeepAlive": ["5"],
+                                  "HostName": ["env10"], "User": ["root"]}
     assert mewww_host.hosts == []
 
     mq_host = m_host.hosts[1]
     assert mq_host.trackable
     assert mq_host.fullname == "mq"
-    assert mq_host.options == {"Protocol": "2", "Port": "22"}
+    assert mq_host.options == {"Protocol": ["2"], "Port": ["22"]}
     assert mq_host.hosts == []
 
     mv_host = m_host.hosts[2]
     assert mv_host.trackable
     assert mv_host.fullname == "mv"
-    assert mv_host.options == {"Port": "22", "HostName": "env10",
-                               "User": "root"}
+    assert mv_host.options == {"Port": ["22"], "HostName": ["env10"],
+                               "User": ["root"]}
     assert len(mv_host.hosts) == 1
 
     mvwww_host = mv_host.hosts[0]
     assert mvwww_host.trackable
     assert mvwww_host.fullname == "mvWWW"
-    assert mvwww_host.options == {"Port": "22", "TCPKeepAlive": "5",
-                                  "HostName": "env10", "User": "root"}
+    assert mvwww_host.options == {"Port": ["22"], "TCPKeepAlive": ["5"],
+                                  "HostName": ["env10"], "User": ["root"]}
     assert mvwww_host.hosts == []
 
     mx_host = m_host.hosts[3]
     assert not mx_host.trackable
     assert mx_host.fullname == "mx"
-    assert mx_host.options == {"SendEnv": "12", "Port": "22"}
+    assert mx_host.options == {"SendEnv": ["12"], "Port": ["22"]}
     assert len(mx_host.hosts) == 1
 
     mxqex_host = mx_host.hosts[0]
     assert mxqex_host.trackable
     assert mxqex_host.fullname == "mxqex"
-    assert mxqex_host.options == {"SendEnv": "12", "Port": "35",
-                                  "ProxyCommand": "ssh -W %h:%p env312"}
+    assert mxqex_host.options == {"SendEnv": ["12"], "Port": ["35"],
+                                  "ProxyCommand": ["ssh -W %h:%p env312"]}
     assert mxqex_host.hosts == []
 
 
@@ -159,6 +159,27 @@ Host *
 
     assert no_star_host.struct == star_host.struct
     assert no_star_host.struct == star_host_only.struct
+
+
+def test_parse_multiple_options():
+    config = """\
+
+Host q
+    User root
+
+Host name
+    User rooter
+
+    LocalForward 80 brumm:80
+    LocalForward 443 brumm:443
+    LocalForward 22 brumm:23
+""".strip()
+
+    parsed = parser.parse(lexer.lex(config.split("\n")))
+    assert sorted(parsed.hosts[1].options["LocalForward"]) == [
+        "22 brumm:23",
+        "443 brumm:443",
+        "80 brumm:80"]
 
 
 @pytest.mark.parametrize(
