@@ -60,10 +60,25 @@ def test_options():
 
     host1["a"] = 1
 
-    assert host1.values == host1.options
-    assert host1.options == {"a": 1}
+    assert len(host1.values) == len(host1.options)
+    for key, value in host1.values.items():
+        assert sorted(value) == sorted(host1.options[key])
+    assert host1.options == {"a": [1]}
 
-    assert host1["a"] == 1
+    assert host1["a"] == [1]
+
+
+def test_options_several():
+    host = parser.Host("a", None)
+
+    host["a"] = 1
+    assert host.options == {"a": [1]}
+
+    host["a"] = 3
+    assert host.options == {"a": [1, 3]}
+
+    host["a"] = 2
+    assert host.options == {"a": [1, 2, 3]}
 
 
 def test_options_overlap():
@@ -72,15 +87,15 @@ def test_options_overlap():
 
     host1["a"] = 1
     host1["b"] = 2
-    assert host2.options == {"a": 1, "b": 2}
+    assert host2.options == {"a": [1], "b": [2]}
 
     host2["c"] = 3
-    assert host1.options == {"a": 1, "b": 2}
-    assert host2.options == {"a": 1, "b": 2, "c": 3}
+    assert host1.options == {"a": [1], "b": [2]}
+    assert host2.options == {"a": [1], "b": [2], "c": [3]}
 
     host2["b"] = "q"
-    assert host1.options == {"a": 1, "b": 2}
-    assert host2.options == {"a": 1, "b": "q", "c": 3}
+    assert host1.options == {"a": [1], "b": [2]}
+    assert host2.options == {"a": [1], "b": ["q"], "c": [3]}
 
 
 def test_add_host():

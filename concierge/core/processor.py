@@ -19,8 +19,9 @@ def generate(tree):
     for host in flat(tree):
         yield "Host {}".format(host.fullname)
 
-        for option, value in sorted(host.options.items()):
-            yield "    {} {}".format(option, value)
+        for option, values in sorted(host.options.items()):
+            for value in sorted(values):
+                yield "    {} {}".format(option, value)
 
         yield ""
 

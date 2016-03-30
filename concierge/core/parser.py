@@ -90,7 +90,7 @@ LOG = concierge.utils.logger(__name__)
 class Host(object):
 
     def __init__(self, name, parent, trackable=True):
-        self.values = {}
+        self.values = collections.defaultdict(set)
         self.childs = []
         self.name = name
         self.parent = parent
@@ -103,8 +103,16 @@ class Host(object):
 
     @property
     def options(self):
-        parent_options = self.parent.options if self.parent else {}
-        parent_options.update(self.values)
+        if self.parent:
+            parent_options = self.parent.options
+        else:
+            parent_options = collections.defaultdict(set)
+
+        for key, value in self.values.items():
+            # Yes, =, not 'update'. this is done intentionally to
+            # fix the situation when you might have some mutually exclusive
+            # options like User.
+            parent_options[key] = sorted(value)
 
         return parent_options
 
@@ -129,7 +137,7 @@ class Host(object):
         return host
 
     def __setitem__(self, key, value):
-        self.values[key] = value
+        self.values[key].add(value)
 
     def __getitem__(self, key):
         return self.options[key]
@@ -208,12 +216,12 @@ def fix_star_host(root):
         LOG.debug("Add new '*' host.")
         star_host = root.add_host("*")
 
-    values = {}
+    values = collections.defaultdict(set)
     values.update(root.values)
     values.update(star_host.values)
     star_host.values = values
     star_host.trackable = True
-    root.values = {}
+    root.values.clear()
 
     return root
 
