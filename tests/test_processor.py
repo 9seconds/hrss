@@ -17,6 +17,8 @@ Host q
 
         Host h
             HostName hew
+            LocalForward 22 b:22
+            LocalForward 23 b:23
 
     Host q
         HostName qqq
@@ -31,6 +33,8 @@ def test_generate():
     assert new_config == [
         "Host qeh",
         "    HostName hew",
+        "    LocalForward 22 b:22",
+        "    LocalForward 23 b:23",
         "    Port 22",
         "    Protocol 2",
         "",
@@ -50,6 +54,8 @@ def test_process():
     assert process.process(CONTENT) == """\
 Host qeh
     HostName hew
+    LocalForward 22 b:22
+    LocalForward 23 b:23
     Port 22
     Protocol 2
 
