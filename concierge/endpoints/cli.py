@@ -55,5 +55,10 @@ def create_parser():
               "version of concierge will change that behavior."),
         action="store_true",
         default=False)
+    parser.add_argument(
+        "-n", "--notify",
+        help="Notify user on problems.",
+        action="store_true",
+        default=False)
 
     return parser

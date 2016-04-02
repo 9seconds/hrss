@@ -8,6 +8,7 @@ import warnings
 import concierge.core.processor
 import concierge.endpoints.cli
 import concierge.endpoints.templates
+import concierge.notifications
 import concierge.templater
 import concierge.utils
 
@@ -41,6 +42,11 @@ class App(metaclass=abc.ABCMeta):
         self.add_header = options.add_header
         self.no_templater = getattr(options, "no_templater", False)
 
+        if options.notify:
+            self.notificator = concierge.notifications.notifier
+        else:
+            self.notificator = concierge.notifications.dummy_notifier
+
         try:
             self.templater = concierge.templater.resolve_templater(
                 options.use_templater)
@@ -71,8 +77,8 @@ class App(metaclass=abc.ABCMeta):
             with concierge.utils.topen(self.destination_path, True) as destfp:
                 destfp.write(content)
         except Exception as exc:
-            LOG.error("Cannot write to file %s: %s",
-                      self.destination_path, exc)
+            self.log_error("Cannot write to file %s: %s",
+                           self.destination_path, exc)
             raise
 
     def get_new_config(self):
@@ -101,8 +107,8 @@ class App(metaclass=abc.ABCMeta):
         try:
             content = concierge.utils.get_content(self.source_path)
         except Exception as exc:
-            LOG.error("Cannot fetch content from %s: %s",
-                      self.source_path, exc)
+            self.log_error("Cannot fetch content from %s: %s",
+                           self.source_path, exc)
             raise
 
         LOG.info("Original content of %s:\n%s", self.source_path, content)
@@ -115,8 +121,8 @@ class App(metaclass=abc.ABCMeta):
         try:
             content = self.templater.render(content)
         except Exception as exc:
-            LOG.error("Cannot process template (%s) in source file %s.",
-                      self.source_path, self.templater.name, exc)
+            self.log_error("Cannot process template (%s) in source file %s.",
+                           self.source_path, self.templater.name, exc)
             raise
 
         LOG.info("Templated content of %s:\n%s", self.source_path, content)
@@ -127,8 +133,8 @@ class App(metaclass=abc.ABCMeta):
         try:
             return concierge.core.processor.process(content)
         except Exception as exc:
-            LOG.error("Cannot parse content of source file %s: %s",
-                      self.source_path, exc)
+            self.log_error("Cannot parse content of source file %s: %s",
+                           self.source_path, exc)
             raise
 
     def attach_header(self, content):
@@ -137,6 +143,10 @@ class App(metaclass=abc.ABCMeta):
         content = header + content
 
         return content
+
+    def log_error(self, template, *args):
+        LOG.error(template, *args)
+        self.notificator(template % args)
 
 
 def main(app_class):
