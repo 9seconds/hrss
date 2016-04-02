@@ -25,6 +25,16 @@ class SimpleApp(common.App):
         return self.output()
 
 
+def test_resolve_templater_unknown(cliargs_default, monkeypatch):
+    def boom(*args, **kwargs):
+        raise KeyError
+
+    monkeypatch.setattr("concierge.templater.resolve_templater", boom)
+
+    with pytest.raises(ValueError):
+        get_app()
+
+
 def test_fetch_content_ok(cliargs_default, mock_get_content):
     mock_get_content.return_value = "Content"
 

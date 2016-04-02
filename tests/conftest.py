@@ -7,10 +7,12 @@ import shutil
 import sys
 import unittest.mock
 
-import concierge
-import concierge.templater
 import inotify_simple
 import pytest
+
+import concierge
+import concierge.notifications
+import concierge.templater
 
 
 def have_mocked(request, *mock_args, **mock_kwargs):
@@ -50,6 +52,17 @@ def mock_log_configuration(request):
 
     if not marker:
         return have_mocked(request, "concierge.utils.configure_logging")
+
+
+@pytest.fixture(autouse=True)
+def mock_notificatior(request, monkeypatch):
+    marker = request.node.get_marker("no_mock_notificatior")
+
+    if not marker:
+        monkeypatch.setattr(
+            concierge.notifications,
+            "notifier",
+            concierge.notifications.dummy_notifier)
 
 
 @pytest.fixture
@@ -142,6 +155,11 @@ def cliparam_curlsh(request):
     return request.param
 
 
+@pytest.fixture(params=(None, "-n", "--notify"))
+def cliparam_notify(request):
+    return request.param
+
+
 @pytest.fixture
 def cliargs_default(sysargv):
     return sysargv
@@ -151,7 +169,7 @@ def cliargs_default(sysargv):
 def cliargs_fullset(sysargv, cliparam_debug, cliparam_verbose,
                     cliparam_source_path, cliparam_destination_path,
                     cliparam_boring_syntax, cliparam_add_header,
-                    cliparam_no_templater):
+                    cliparam_no_templater, cliparam_notify):
     options = {
         "debug": cliparam_debug,
         "verbose": cliparam_verbose,
@@ -159,10 +177,11 @@ def cliargs_fullset(sysargv, cliparam_debug, cliparam_verbose,
         "destination_path": cliparam_destination_path,
         "add_header": cliparam_add_header,
         "boring_syntax": cliparam_boring_syntax,
-        "no_templater": cliparam_no_templater}
+        "no_templater": cliparam_no_templater,
+        "notify": cliparam_notify}
     bool_params = (
         cliparam_debug, cliparam_verbose, cliparam_boring_syntax,
-        cliparam_add_header)
+        cliparam_add_header, cliparam_notify)
     value_params = (
         cliparam_source_path, cliparam_destination_path)
 
