@@ -42,10 +42,10 @@ class App(metaclass=abc.ABCMeta):
         self.add_header = options.add_header
         self.no_templater = getattr(options, "no_templater", False)
 
-        if options.notify:
-            self.notificator = concierge.notifications.notifier
-        else:
+        if options.no_desktop_notifications:
             self.notificator = concierge.notifications.dummy_notifier
+        else:
+            self.notificator = concierge.notifications.notifier
 
         try:
             self.templater = concierge.templater.resolve_templater(

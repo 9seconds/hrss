@@ -56,8 +56,8 @@ def create_parser():
         action="store_true",
         default=False)
     parser.add_argument(
-        "-n", "--notify",
-        help="Notify user on problems.",
+        "-n", "--no-desktop-notifications",
+        help="Do not show desktop notifications on problems.",
         action="store_true",
         default=False)
 

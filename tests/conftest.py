@@ -155,8 +155,8 @@ def cliparam_curlsh(request):
     return request.param
 
 
-@pytest.fixture(params=(None, "-n", "--notify"))
-def cliparam_notify(request):
+@pytest.fixture(params=(None, "-n", "--no-desktop-notifications"))
+def cliparam_no_desktop_notifications(request):
     return request.param
 
 
@@ -169,7 +169,7 @@ def cliargs_default(sysargv):
 def cliargs_fullset(sysargv, cliparam_debug, cliparam_verbose,
                     cliparam_source_path, cliparam_destination_path,
                     cliparam_boring_syntax, cliparam_add_header,
-                    cliparam_no_templater, cliparam_notify):
+                    cliparam_no_templater, cliparam_no_desktop_notifications):
     options = {
         "debug": cliparam_debug,
         "verbose": cliparam_verbose,
@@ -178,10 +178,10 @@ def cliargs_fullset(sysargv, cliparam_debug, cliparam_verbose,
         "add_header": cliparam_add_header,
         "boring_syntax": cliparam_boring_syntax,
         "no_templater": cliparam_no_templater,
-        "notify": cliparam_notify}
+        "no_desktop_notifications": cliparam_no_desktop_notifications}
     bool_params = (
         cliparam_debug, cliparam_verbose, cliparam_boring_syntax,
-        cliparam_add_header, cliparam_notify)
+        cliparam_add_header, cliparam_no_desktop_notifications)
     value_params = (
         cliparam_source_path, cliparam_destination_path)
 
