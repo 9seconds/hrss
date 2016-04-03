@@ -62,21 +62,20 @@ or if you want to install it manually, do following:
     $ cd concierge
     $ python setup.py install
 
-By default, no template support will be installed. If you want to use
-Mako_ or Jinja2_, please do following:
+By default, no template support is going to be installed. If you want to
+use Mako_ or Jinja2_, please refer to `Templaters`_ section.
+
+Also, it is possible to install support of `libnotify
+<https://developer.gnome.org/libnotify/>`_. Please install tool like
+this:
 
 .. code-block:: shell
 
-    $ pip install concierge[mako]
+    $ pip install concierge[libnotify]
 
-or
-
-.. code-block:: shell
-
-    $ pip install concierge[jinja]
-
-
-If you already have them installed, then you are good.
+In that case, you will have a desktop notifications about any problem
+with parsing of your ``~/.conciergerc``. Yep, these Ubuntu popups on the
+right top of the screen.
 
 If you have a problems with Pip installation (with modifiers, for
 example), please update your pip and setuptools first.
@@ -95,6 +94,28 @@ After installation, 2 utilities will be available:
 
 * ``concierge-check``
 * ``concierge``
+
+
+Templaters
+----------
+
+``concierge`` comes with support of additional templaters, you may plug
+them in installing the packages from PyPI. At the time of writing,
+support of following templaters was done:
+
+* `concierge-mako <https://github.com/9seconds/concierge-mako>`_ -
+  support of Mako_ templates
+* `concierge-jinja <https://github.com/9seconds/concierge-jinja>`_ -
+  support of Jinja2_ templates
+
+To install them just do
+
+.. code-block:: shell
+
+    $ pip install concierge-mako
+
+And ``concierge`` will automatically recognizes support of Mako and now
+one may use ``concierge -u mako`` for her ``~/.conciergerc``.
 
 
 concierge-check

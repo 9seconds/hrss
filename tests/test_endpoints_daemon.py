@@ -57,7 +57,7 @@ def test_print_help(capfd, cliargs_default, cliparam_curlsh):
     "main_method", (
         True, False))
 def test_work(mock_mainfunc, ptmpdir, main_method):
-    _, _, _, inotifier = mock_mainfunc
+    _, _, inotifier = mock_mainfunc
 
     app = get_app()
     app.destination_path = ptmpdir.join("filename").strpath
@@ -76,7 +76,7 @@ def test_work(mock_mainfunc, ptmpdir, main_method):
 
 
 def test_track_no_our_events(no_sleep, mock_mainfunc, ptmpdir):
-    _, _, _, inotifier = mock_mainfunc
+    _, _, inotifier = mock_mainfunc
 
     inotifier.v.clear()
     inotifier.v.extend([inotify_simple.Event(0, 0, 0, "Fake")] * 3)
@@ -89,7 +89,7 @@ def test_track_no_our_events(no_sleep, mock_mainfunc, ptmpdir):
 
 
 def test_track_cannot_read(no_sleep, mock_mainfunc, ptmpdir):
-    _, _, _, inotifier = mock_mainfunc
+    _, _, inotifier = mock_mainfunc
 
     def add_watch(*args, **kwargs):
         exc = IOError("Hello?")
@@ -138,7 +138,7 @@ def test_mainfunc_ok(mock_mainfunc):
 
 
 def test_mainfunc_exception(mock_mainfunc):
-    _, _, _, inotifier = mock_mainfunc
+    _, _, inotifier = mock_mainfunc
     inotifier.read.side_effect = Exception
 
     result = daemon.main()

@@ -25,16 +25,24 @@ class SimpleApp(common.App):
         return self.output()
 
 
-def test_fetch_content_ok(cliargs_default, templater,
-                          mock_get_content):
+def test_resolve_templater_unknown(cliargs_default, monkeypatch):
+    def boom(*args, **kwargs):
+        raise KeyError
+
+    monkeypatch.setattr("concierge.templater.resolve_templater", boom)
+
+    with pytest.raises(ValueError):
+        get_app()
+
+
+def test_fetch_content_ok(cliargs_default, mock_get_content):
     mock_get_content.return_value = "Content"
 
     app = get_app()
     assert app.fetch_content() == mock_get_content.return_value
 
 
-def test_fetch_content_exception(cliargs_default, templater,
-                                 mock_get_content):
+def test_fetch_content_exception(cliargs_default, mock_get_content):
     mock_get_content.side_effect = Exception
 
     app = get_app()
@@ -42,18 +50,16 @@ def test_fetch_content_exception(cliargs_default, templater,
         app.fetch_content()
 
 
-def test_apply_content_ok(monkeypatch, cliargs_default, templater):
-    monkeypatch.setattr(templater, "render", lambda param: param.upper())
+def test_apply_content_ok(monkeypatch, cliargs_default, template_render):
+    template_render.side_effect = lambda param: param.upper()
 
     app = get_app()
     assert app.apply_template("hello") == "HELLO"
 
 
-def test_apply_content_exception(monkeypatch, cliargs_default, templater):
-    def badfunc(content):
-        raise Exception
-
-    monkeypatch.setattr(templater, "render", badfunc)
+def test_apply_content_exception(monkeypatch, cliargs_default,
+                                 template_render):
+    template_render.side_effect = Exception
 
     app = get_app()
     with pytest.raises(Exception):
@@ -93,10 +99,10 @@ def test_attach_header(cliargs_default):
 @pytest.mark.parametrize(
     "add_header", (
         True, False))
-def test_get_new_config(monkeypatch, cliargs_default, templater,
+def test_get_new_config(monkeypatch, cliargs_default, template_render,
                         mock_get_content, no_templater, boring_syntax,
                         add_header):
-    monkeypatch.setattr(templater, "render", lambda param: param.upper())
+    template_render.side_effect = lambda param: param.upper()
     mock_get_content.return_value = """\
 Compression yes
 
@@ -134,8 +140,7 @@ Host q
             assert not result.startswith("#")
 
 
-def test_output_stdout(capfd, monkeypatch, cliargs_default, templater,
-                       mock_get_content):
+def test_output_stdout(capfd, monkeypatch, cliargs_default, mock_get_content):
     mock_get_content.return_value = """\
 Compression yes
 
@@ -166,7 +171,7 @@ Host *
     assert not err
 
 
-def test_output_file(cliargs_default, ptmpdir, templater, mock_get_content):
+def test_output_file(cliargs_default, ptmpdir, mock_get_content):
     mock_get_content.return_value = """\
 Compression yes
 
@@ -187,7 +192,7 @@ Host q
 
 
 def test_output_file_exception(monkeypatch, cliargs_default, ptmpdir,
-                               templater, mock_get_content):
+                               mock_get_content):
     def write_fail(*args, **kwargs):
         raise Exception
 
@@ -210,7 +215,7 @@ Host q
 
 
 @pytest.mark.longrun
-def test_create_app(cliargs_fullset, templater, mock_log_configuration):
+def test_create_app(cliargs_fullset, mock_log_configuration):
     _, options = cliargs_fullset
 
     parser = cli.create_parser()
@@ -235,15 +240,10 @@ def test_create_app(cliargs_fullset, templater, mock_log_configuration):
     else:
         assert app.add_header == (options["destination_path"] is not None)
 
-    if templater.name:
-        assert app.no_templater == bool(options["no_templater"])
-    else:
-        assert not app.no_templater
-
     assert mock_log_configuration.called
 
 
-def test_mainfunc_ok(cliargs_default, templater, mock_get_content):
+def test_mainfunc_ok(cliargs_default, mock_get_content):
     mock_get_content.return_value = """\
 Compression yes
 
@@ -260,7 +260,7 @@ Host q
     assert result is None or result == os.EX_OK
 
 
-def test_mainfunc_exception(cliargs_default, templater, mock_get_content):
+def test_mainfunc_exception(cliargs_default, mock_get_content):
     mock_get_content.side_effect = Exception
 
     main = concierge.endpoints.common.main(SimpleApp)
@@ -268,8 +268,7 @@ def test_mainfunc_exception(cliargs_default, templater, mock_get_content):
     assert main() != os.EX_OK
 
 
-def test_mainfunc_keyboardinterrupt(cliargs_default, templater,
-                                    mock_get_content):
+def test_mainfunc_keyboardinterrupt(cliargs_default, mock_get_content):
     mock_get_content.side_effect = KeyboardInterrupt
 
     main = concierge.endpoints.common.main(SimpleApp)

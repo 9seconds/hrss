@@ -7,19 +7,12 @@ import shutil
 import sys
 import unittest.mock
 
-import concierge
 import inotify_simple
 import pytest
 
-
-class FakeTemplater(object):
-
-    @staticmethod
-    def render(content):
-        return content
-
-    def __init__(self, name):
-        self.name = name
+import concierge
+import concierge.notifications
+import concierge.templater
 
 
 def have_mocked(request, *mock_args, **mock_kwargs):
@@ -61,6 +54,17 @@ def mock_log_configuration(request):
         return have_mocked(request, "concierge.utils.configure_logging")
 
 
+@pytest.fixture(autouse=True)
+def mock_notificatior(request, monkeypatch):
+    marker = request.node.get_marker("no_mock_notificatior")
+
+    if not marker:
+        monkeypatch.setattr(
+            concierge.notifications,
+            "notifier",
+            concierge.notifications.dummy_notifier)
+
+
 @pytest.fixture
 def ptmpdir(request, tmpdir):
     for key in "TMP", "TEMPDIR", "TEMP":
@@ -78,15 +82,6 @@ def sysargv(monkeypatch):
     monkeypatch.setattr(sys, "argv", argv)
 
     return argv
-
-
-@pytest.fixture(params=(None, "Fake"))
-def templater(request, monkeypatch):
-    templater = FakeTemplater(request.param)
-
-    monkeypatch.setitem(concierge.EXTRAS, "templater", templater)
-
-    return templater
 
 
 @pytest.fixture
@@ -108,6 +103,11 @@ def inotifier(request):
     mock.v = values
 
     return mock
+
+
+@pytest.fixture
+def template_render(request):
+    return have_mocked(request, concierge.templater.Templater, "render")
 
 
 @pytest.fixture(params=(None, "-d", "--debug"))
@@ -155,16 +155,21 @@ def cliparam_curlsh(request):
     return request.param
 
 
+@pytest.fixture(params=(None, "-n", "--no-desktop-notifications"))
+def cliparam_no_desktop_notifications(request):
+    return request.param
+
+
 @pytest.fixture
 def cliargs_default(sysargv):
     return sysargv
 
 
 @pytest.fixture
-def cliargs_fullset(sysargv, templater, cliparam_debug, cliparam_verbose,
+def cliargs_fullset(sysargv, cliparam_debug, cliparam_verbose,
                     cliparam_source_path, cliparam_destination_path,
                     cliparam_boring_syntax, cliparam_add_header,
-                    cliparam_no_templater):
+                    cliparam_no_templater, cliparam_no_desktop_notifications):
     options = {
         "debug": cliparam_debug,
         "verbose": cliparam_verbose,
@@ -172,10 +177,11 @@ def cliargs_fullset(sysargv, templater, cliparam_debug, cliparam_verbose,
         "destination_path": cliparam_destination_path,
         "add_header": cliparam_add_header,
         "boring_syntax": cliparam_boring_syntax,
-        "no_templater": cliparam_no_templater}
+        "no_templater": cliparam_no_templater,
+        "no_desktop_notifications": cliparam_no_desktop_notifications}
     bool_params = (
         cliparam_debug, cliparam_verbose, cliparam_boring_syntax,
-        cliparam_add_header)
+        cliparam_add_header, cliparam_no_desktop_notifications)
     value_params = (
         cliparam_source_path, cliparam_destination_path)
 
@@ -188,7 +194,7 @@ def cliargs_fullset(sysargv, templater, cliparam_debug, cliparam_verbose,
             sysargv.append(param)
             sysargv.append("/path/to")
 
-    if templater.name and cliparam_no_templater:
+    if cliparam_no_templater:
         sysargv.append(cliparam_no_templater)
 
     return sysargv, options
@@ -210,7 +216,7 @@ def cliargs_concierge_fullset(cliargs_fullset, cliparam_systemd,
 
 
 @pytest.fixture
-def mock_mainfunc(cliargs_default, mock_get_content, templater, inotifier):
+def mock_mainfunc(cliargs_default, mock_get_content, inotifier):
     mock_get_content.return_value = """\
 Compression yes
 
@@ -221,4 +227,4 @@ Host q
         HostName lalala
     """
 
-    return cliargs_default, mock_get_content, templater, inotifier
+    return cliargs_default, mock_get_content, inotifier

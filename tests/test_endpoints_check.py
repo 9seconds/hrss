@@ -14,7 +14,7 @@ def test_mainfunc_ok(mock_mainfunc):
 
 
 def test_mainfunc_exception(mock_mainfunc):
-    _, mock_get_content, _, _ = mock_mainfunc
+    _, mock_get_content, _ = mock_mainfunc
     mock_get_content.side_effect = Exception
 
     main = concierge.endpoints.common.main(concierge.endpoints.check.CheckApp)

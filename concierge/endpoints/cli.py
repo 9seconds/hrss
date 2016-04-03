@@ -4,6 +4,7 @@
 import argparse
 
 import concierge
+import concierge.templater
 
 
 def create_parser():
@@ -40,13 +41,24 @@ def create_parser():
               "DESTINATION_PATH is stdout, then this option is set to false."),
         action="store_true",
         default=None)
-
-    if concierge.EXTRAS["templater"].name:
-        parser.add_argument(
-            "-t", "--no-templater",
-            help="Do not use {} templater for SOURCE_PATH.".format(
-                concierge.EXTRAS["templater"].name),
-            action="store_true",
-            default=False)
+    parser.add_argument(
+        "-u", "--use-templater",
+        help=("Use following templater for config file. If nothing is set, "
+              "then default template resolve chain will be "
+              "used (Mako -> Jinja -> Nothing). Dummy templater means that "
+              "no templater is actually used."),
+        choices=concierge.templater.all_templaters().keys(),
+        default=None)
+    parser.add_argument(
+        "-t", "--no-templater",
+        help=("Do not use any templater. Please be noticed that newer "
+              "version of concierge will change that behavior."),
+        action="store_true",
+        default=False)
+    parser.add_argument(
+        "-n", "--no-desktop-notifications",
+        help="Do not show desktop notifications on problems.",
+        action="store_true",
+        default=False)
 
     return parser

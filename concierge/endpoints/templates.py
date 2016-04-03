@@ -22,14 +22,13 @@ HEADER = """
 SYSTEMD_CONFIG = """
 [Unit]
 Description=Daemon for converting ~/.concierge to ~/.ssh/config
-After=syslog.target
 
 [Service]
-ExecStart={command} -o {sshconfig}
+ExecStart={command} -u {templater} -o {sshconfig}
 Restart=on-failure
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=default.target
 """.strip()
 
 SYSTEMD_SERVICE_NAME = "concierge.service"
@@ -52,14 +51,15 @@ def make_header(**kwargs):
         rc_file=kwargs.get("rc_file", "???"))
 
 
-def make_systemd_script():
+def make_systemd_script(templater):
     systemd_user_path = os.path.join(concierge.HOME_DIR,
                                      ".config", "systemd", "user")
     systemd_user_service_path = os.path.join(systemd_user_path,
                                              SYSTEMD_SERVICE_NAME)
     systemd_config = SYSTEMD_CONFIG.format(
         command=distutils.spawn.find_executable(sys.argv[0]),
-        sshconfig=concierge.DEFAULT_SSHCONFIG)
+        sshconfig=concierge.DEFAULT_SSHCONFIG,
+        templater=templater.name.lower())
 
     yield 'mkdir -p "{0}" || true'.format(systemd_user_path)
     yield 'cat > "{0}" <<EOF\n{1}\nEOF'.format(systemd_user_service_path,
