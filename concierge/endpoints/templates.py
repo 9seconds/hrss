@@ -22,14 +22,13 @@ HEADER = """
 SYSTEMD_CONFIG = """
 [Unit]
 Description=Daemon for converting ~/.concierge to ~/.ssh/config
-After=syslog.target
 
 [Service]
 ExecStart={command} -u {templater} -o {sshconfig}
 Restart=on-failure
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=default.target
 """.strip()
 
 SYSTEMD_SERVICE_NAME = "concierge.service"
