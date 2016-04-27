@@ -1,27 +1,20 @@
 language: python
 sudo: false
 cache: pip
+python: 2.7
 
-python:
-  - "3.3"
-  - "3.4"
-  - "3.5"
+env:
+  - TOXENV=static
+  - TOXENV=metrics
+  - TOXENV=py33
+  - TOXENV=py34
+  - TOXENV=py35
 
 before_install:
   - pip install codecov
 
-install:
-  - pip install -r requirements.txt -r test-requirements.txt
-  - pip install -U pip setuptools
-  - python setup.py develop
-
-script:
-  - py.test --cov-fail-under 90
-  - flake8
-  - radon cc --average --show-closures concierge
-  - radon raw --summary concierge
-  - radon mi --show --multi concierge
-  - xenon -aA -mA -bB concierge
+install: pip install tox
+script: tox
 
 after_success:
   - codecov
