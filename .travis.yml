@@ -1,7 +1,7 @@
 language: python
 sudo: false
 cache: pip
-python: 2.7
+python: 3.5
 
 env:
   - TOXENV=static
