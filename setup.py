@@ -4,9 +4,6 @@
 
 import setuptools
 
-from setuptools.command.test import test as TestCommand  # NOQA
-import sys
-
 try:
     import multiprocessing
     assert multiprocessing
