@@ -78,7 +78,9 @@ VALID_OPTIONS = set((
     "VerifyHostKeyDNS",
     "VisualHostKey",
     "XAuthLocation",
-    "User"
+    "User",
+    "CertificateFile",
+    "UseRoaming"
 ))
 
 VIA_JUMP_HOST_OPTION = "ViaJumpHost"
