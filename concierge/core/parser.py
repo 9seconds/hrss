@@ -100,6 +100,8 @@ class Host(object):
 
     @property
     def fullname(self):
+        if self.name != "" and self.name[0] == "_":
+            return self.name[1:]
         parent_name = self.parent.fullname if self.parent else ""
         return parent_name + self.name
 
