@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 
 
+import pytest
+
 import concierge.core.exceptions as exceptions
 import concierge.core.lexer as lexer
-
-import pytest
 
 
 def make_token(indent_lvl=0):

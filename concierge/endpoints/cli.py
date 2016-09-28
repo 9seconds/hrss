@@ -21,7 +21,7 @@ def create_parser():
         default=False)
     parser.add_argument(
         "-s", "--source-path",
-        help="Path of concierge. Default is {}".format(concierge.DEFAULT_RC),
+        help="Path of concierge. Default is {0}".format(concierge.DEFAULT_RC),
         default=concierge.DEFAULT_RC)
     parser.add_argument(
         "-o", "--destination-path",
