@@ -147,7 +147,7 @@ class Host(object):
         return self.options[key]
 
     def __str__(self):
-        return "<Host {}>".format(self.fullname)
+        return "<Host {0}>".format(self.fullname)
 
     def __repr__(self, indent=True):
         indent = 4 if indent else None
@@ -196,7 +196,7 @@ def parse_options(root, tokens):
         elif token.option == VIA_JUMP_HOST_OPTION:
             LOG.debug("Special option %s in token %s is detected.",
                       VIA_JUMP_HOST_OPTION, token)
-            root["ProxyCommand"] = "ssh -W %h:%p {}".format(token.values[0])
+            root["ProxyCommand"] = "ssh -W %h:%p {0}".format(token.values[0])
         elif token.option not in VALID_OPTIONS:
             LOG.debug("Option %s in token %s is unknown.", token.option, token)
             raise exceptions.ParserUnknownOption(token.option)

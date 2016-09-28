@@ -10,4 +10,4 @@ DEFAULT_RC = os.path.join(HOME_DIR, ".conciergerc")
 DEFAULT_SSHCONFIG = os.path.join(HOME_DIR, ".ssh", "config")
 
 
-warnings.simplefilter('always', DeprecationWarning)
+warnings.simplefilter("always", DeprecationWarning)

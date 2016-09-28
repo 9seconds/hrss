@@ -34,7 +34,7 @@ LOG_CONFIG = {
             "format": "[%(levelname)s] %(message)s"
         },
         "syslog": {
-            "format": "{}[%(process)d]: %(message)s".format(LOG_NAMESPACE)
+            "format": "{0}[%(process)d]: %(message)s".format(LOG_NAMESPACE)
         }
     },
     "handlers": {

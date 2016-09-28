@@ -1,9 +1,13 @@
 flake8
-flake8-debugger
+flake8-bugbear
+flake8-builtins
 flake8-coding
-#flake8-pep257
-hacking
-pep8
+flake8_comprehensions
+flake8-debugger
+flake8-import-order
+flake8-mutable
+flake8-quotes
+flake8-string-format
 pep8-naming
 pytest
 pytest-cov

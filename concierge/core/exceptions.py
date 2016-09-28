@@ -18,7 +18,7 @@ class LexerError(ValueError, ReaderError):
 
 class LexerIncorrectOptionValue(LexerError):
 
-    MESSAGE = "Cannot find correct option/value pair on line {} '{}'"
+    MESSAGE = "Cannot find correct option/value pair on line {0} '{1}'"
 
     def __init__(self, line, lineno):
         super().__init__(self.MESSAGE.format(lineno, line))
@@ -26,8 +26,8 @@ class LexerIncorrectOptionValue(LexerError):
 
 class LexerIncorrectIndentationLength(LexerError):
 
-    MESSAGE = ("Incorrect indentation on line {} '{}'"
-               "({} spaces, has to be divisible by {})")
+    MESSAGE = ("Incorrect indentation on line {0} '{1}'"
+               "({2} spaces, has to be divisible by {3})")
 
     def __init__(self, line, lineno, indentation_value):
         super().__init__(
@@ -39,7 +39,7 @@ class LexerIncorrectIndentationLength(LexerError):
 
 class LexerIncorrectFirstIndentationError(LexerError):
 
-    MESSAGE = "Line {} '{}' has to have no indentation at all"
+    MESSAGE = "Line {0} '{1}' has to have no indentation at all"
 
     def __init__(self, line, lineno):
         super().__init__(self.MESSAGE.format(lineno, line))
@@ -47,7 +47,7 @@ class LexerIncorrectFirstIndentationError(LexerError):
 
 class LexerIncorrectIndentationError(LexerError):
 
-    MESSAGE = "Incorrect indentation on line {} '{}'"
+    MESSAGE = "Incorrect indentation on line {0} '{1}'"
 
     def __init__(self, line, lineno):
         super().__init__(self.MESSAGE.format(lineno, line))
@@ -59,7 +59,7 @@ class ParserError(ValueError, ReaderError):
 
 class ParserUnknownOption(ParserError):
 
-    MESSAGE = "Unknown option {}"
+    MESSAGE = "Unknown option {0}"
 
     def __init__(self, option):
         super().__init__(self.MESSAGE.format(option))
