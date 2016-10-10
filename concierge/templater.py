@@ -5,7 +5,7 @@ import pkg_resources
 
 
 TEMPLATER_NAMESPACE = "concierge.templater"
-DEFAULT_RESOLVE_SEQ = "mako", "jinja2"
+DEFAULT_RESOLVE_SEQ = "mako", "jinja"
 
 
 def all_templaters():

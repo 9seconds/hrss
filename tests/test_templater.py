@@ -33,7 +33,7 @@ def create_templater(name_):
 def mock_plugins(request, monkeypatch):
     templaters = [
         Plugin(create_templater(name))
-        for name in ("mako", "jinja2")]
+        for name in ("mako", "jinja")]
 
     monkeypatch.setattr(
         "pkg_resources.iter_entry_points",
@@ -48,7 +48,7 @@ def test_all_templaters(mock_plugins):
     assert len(tpls) == 3
     assert tpls["dummy"] is templater.Templater
     assert tpls["mako"]().render("q") == "mako q"
-    assert tpls["jinja2"]().render("q") == "jinja2 q"
+    assert tpls["jinja"]().render("q") == "jinja q"
 
 
 def test_resolve_templater_none(mock_plugins):
@@ -62,13 +62,13 @@ def test_resolve_templater_default(mock_plugins):
     assert templater.resolve_templater(None).name == "mako"
     del mock_plugins[0]
 
-    assert templater.resolve_templater(None).name == "jinja2"
+    assert templater.resolve_templater(None).name == "jinja"
     del mock_plugins[0]
 
     assert templater.resolve_templater(None).name == "dummy"
 
 
-@pytest.mark.parametrize("code", ("mako", "jinja2", "dummy"))
+@pytest.mark.parametrize("code", ("mako", "jinja", "dummy"))
 def test_resolve_templater_known(mock_plugins, code):
     assert templater.resolve_templater(code).name == code
 
