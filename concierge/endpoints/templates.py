@@ -59,7 +59,7 @@ def make_systemd_script(templater):
     systemd_config = SYSTEMD_CONFIG.format(
         command=distutils.spawn.find_executable(sys.argv[0]),
         sshconfig=concierge.DEFAULT_SSHCONFIG,
-        templater=templater.name.lower())
+        templater=templater)
 
     yield 'mkdir -p "{0}" || true'.format(systemd_user_path)
     yield 'cat > "{0}" <<EOF\n{1}\nEOF'.format(systemd_user_service_path,

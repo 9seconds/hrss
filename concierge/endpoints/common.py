@@ -41,6 +41,7 @@ class App(metaclass=abc.ABCMeta):
         self.boring_syntax = options.boring_syntax
         self.add_header = options.add_header
         self.no_templater = getattr(options, "no_templater", False)
+        self.templater_name = options.use_templater
 
         if options.no_desktop_notifications:
             self.notificator = concierge.notifications.dummy_notifier
@@ -49,7 +50,7 @@ class App(metaclass=abc.ABCMeta):
 
         try:
             self.templater = concierge.templater.resolve_templater(
-                options.use_templater)
+                self.templater_name)
         except KeyError:
             raise ValueError(
                 "Cannot find templater for {0}".format(options.use_templater))
