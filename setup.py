@@ -17,7 +17,7 @@ REQUIREMENTS = (
 
 setuptools.setup(
     name="concierge",
-    version="0.2.1",
+    version="0.2.2",
     description="Maintainable SSH config",
     long_description=long_description,
     url="https://github.com/9seconds/concierge",
