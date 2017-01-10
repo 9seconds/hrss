@@ -10,8 +10,7 @@ with open("README.rst", "rt") as readme_fp:
 
 
 REQUIREMENTS = (
-    "inotify_simple",
-    "enum34"
+    "inotify_simple"
 )
 
 
