@@ -10,6 +10,7 @@ import concierge.utils
 
 
 VALID_OPTIONS = set((
+    "AddKeysToAgent",
     "AddressFamily",
     "BatchMode",
     "BindAddress",
