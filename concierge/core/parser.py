@@ -11,6 +11,7 @@ import concierge.utils
 
 VALID_OPTIONS = set((
     "AddressFamily",
+    "AddKeysToAgent",
     "BatchMode",
     "BindAddress",
     "ChallengeResponseAuthentication",
@@ -60,6 +61,7 @@ VALID_OPTIONS = set((
     "PreferredAuthentications",
     "Protocol",
     "ProxyCommand",
+    "ProxyJump",
     "PubkeyAuthentication",
     "RekeyLimit",
     "RemoteForward",
