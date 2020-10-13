@@ -17,14 +17,14 @@ REQUIREMENTS = (
 
 setuptools.setup(
     name="concierge",
-    version="0.2.2",
+    version="0.2.3",
     description="Maintainable SSH config",
     long_description=long_description,
-    url="https://github.com/9seconds/concierge",
+    url="https://github.com/Tr4sK/concierge",
     author="Sergey Arkhipov",
     author_email="serge@aerialsounds.org",
-    maintainer="Sergey Arkhipov",
-    maintainer_email="serge@aerialsounds.org",
+    maintainer="Tr4sK",
+    maintainer_email="github@tr4sk.me",
     license="MIT",
     packages=setuptools.find_packages(exclude=["tests"]),
     install_requires=REQUIREMENTS,
