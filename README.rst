@@ -294,6 +294,24 @@ equivalent.
 
     CompressionLevel 9
 
+You can also work the other way around with a star.
+In this example, I remove the first Host line from being generated and add that
+domain information to other host.
+Also, ProxyJump is available
+
+::
+
+    Compression yes
+
+    -Host *.my.domain
+        Compression no
+        User tr4sk
+        ProxyJump gateway
+
+        Host server1
+            User root
+        Host server2
+
 
 This is a basic. But if you install ``concierge`` with support of Mako or
 Jinja2 templates, you may use them in your ``~/.conciergerc``.
@@ -401,6 +419,24 @@ look around.
 |       User sa                          |                                            |
 |                                        |   Host *                                   |
 |                                        |       Compression yes                      |
+|                                        |                                            |
++----------------------------------------+--------------------------------------------+
+| ::                                     | ::                                         |
+|                                        |                                            |
+|   Compression yes                      |   Host blog                                |
+|                                        |       User sa                              |
+|  -Host \*.my.domain                    |                                            |
+|       User nineseconds                 |   Host first.my.domain                     |
+|                                        |       Protocol 2                           |
+|       Host first                       |       User nineseconds                     |
+|       Host second                      |   Host second.my.domain                    |
+|           HostName 10.10.10.1          |       User nineseconds                     |
+|                                        |       Protocol 2                           |
+|                                        |       HostName 10.10.10.1                  |
+|       Protocol 2                       |                                            |
+|                                        |   Host *                                   |
+|   Host blog                            |       Compression yes                      |
+|       User sa                          |                                            |
 |                                        |                                            |
 +----------------------------------------+--------------------------------------------+
 

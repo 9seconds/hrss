@@ -11,6 +11,7 @@ import concierge.utils
 
 VALID_OPTIONS = set((
     "AddressFamily",
+    "AddKeysToAgent",
     "BatchMode",
     "BindAddress",
     "ChallengeResponseAuthentication",
@@ -60,6 +61,7 @@ VALID_OPTIONS = set((
     "PreferredAuthentications",
     "Protocol",
     "ProxyCommand",
+    "ProxyJump",
     "PubkeyAuthentication",
     "RekeyLimit",
     "RemoteForward",
@@ -103,6 +105,8 @@ class Host(object):
         if self.name != "" and self.name[0] == "_":
             return self.name[1:]
         parent_name = self.parent.fullname if self.parent else ""
+        if parent_name != "" and parent_name[0] == "*":
+            return self.name + parent_name[1:]
         return parent_name + self.name
 
     @property
